@@ -1,14 +1,16 @@
 import Info from "./Info";
-import Navigation from "./Navigation";
+import Navigation from "./Navigation/Navigation";
 import UploadButton from "./UploadButton";
+import Background from "./Assets/cubes/cubes.png";
 
 function Home(): JSX.Element {
   return (
-    <div className="home">
-      <p>This is the Home component.</p>
-      <Navigation />
-      <Info />
-      <UploadButton />
+    <div style={{ backgroundImage: `url(${Background})` }}>
+      <div className="home">
+        <Navigation />
+        <Info />
+        <UploadButton />
+      </div>
     </div>
   );
 }
