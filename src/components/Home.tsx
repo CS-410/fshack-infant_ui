@@ -2,6 +2,7 @@ import Info from './Info';
 import Navigation from './Navigation';
 import UploadButton from './UploadButton';
 import Background from './Assets/cubes.png';
+import Client from '@fnndsc/chrisapi';
 
 function Home(): JSX.Element {
 	return (

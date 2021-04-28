@@ -1,6 +1,6 @@
 import logo from './Assets/BCHLogo.png';
 
-function links(text: string): JSX.Element {
+function navLink(text: string): JSX.Element {
 	return (
 		<li>
 			<a href={'#' + text.toLowerCase()}>{text}</a>
@@ -15,9 +15,9 @@ function Navigation(): JSX.Element {
 				<img className="navBar-Logo" src={logo} alt="Logo" />
 			</a>
 			<ul className="navBar-Links">
-				{links('Home')}
-				{links('Results')}
-				{links('Login')}
+				{navLink('Home')}
+				{navLink('Results')}
+				{navLink('Login')}
 			</ul>
 		</div>
 	);
