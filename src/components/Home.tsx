@@ -1,7 +1,7 @@
 import Info from "./Info";
-import Navigation from "./Navigation/Navigation";
+import Navigation from "./Navigation";
 import UploadButton from "./UploadButton";
-import Background from "./Assets/cubes/cubes.png";
+import Background from "./Assets/cubes.png";
 
 function Home(): JSX.Element {
   return (
