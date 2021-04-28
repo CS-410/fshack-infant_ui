@@ -1,4 +1,4 @@
-import './Navigation';
+import Navigation from './Navigation';
 
 function Results(): JSX.Element {
 	return (
