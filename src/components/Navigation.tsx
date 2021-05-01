@@ -16,8 +16,8 @@ function Navigation(): JSX.Element {
 			</a>
 			<ul className="navBar-Links">
 				{navLink('Home')}
-				{navLink('Results')}
-				{navLink('Login')}
+				{navLink('Doumentation')}
+				{navLink('Result')}
 			</ul>
 		</div>
 	);

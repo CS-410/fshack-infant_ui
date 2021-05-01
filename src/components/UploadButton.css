@@ -1,0 +1,15 @@
+.uploadButton {
+    position: sticky;
+    background-color: #5694D2;
+    width: 250px;
+    height: 150px;
+    padding-top: 200px;
+    padding-right: 30px;
+    padding-bottom: 100px;
+    padding-left: 80px;
+    color: white;
+    left: 700px;
+    bottom: 330px;
+    margin-top: 120px;
+    margin-bottom: 10px;
+}

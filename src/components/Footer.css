@@ -1,0 +1,11 @@
+.main-footer {
+    color: white;
+    background-image: url("./Assets/loginbg_2000.png");
+
+    padding: 5em 80em;
+    padding-top: 3em;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+
+}

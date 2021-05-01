@@ -1,18 +1,23 @@
 body {
+
   margin: 0;
-  font-family: "Overpass", BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-image: url("https://www.777carsaz.com/templates/10596/images/patterns/cubes.png");
+  background-color: #cccccc;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 /* Background Styling */
+
 
 /* Navbar Styling */
 
@@ -29,4 +34,20 @@ code {
 /* navBar-Links */
 .navBar-Links {
   display: inline-block;
+}
+
+/* Footer Styling */
+
+/* .main-footer-row {
+  display: flex;
+} */
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrap {
+  flex:1;
 }
