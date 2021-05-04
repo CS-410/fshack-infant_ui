@@ -1,5 +1,4 @@
 import "./App.css";
-import React, { Component } from 'react';
 
 import Navigation from "./Navigation.js";
 import UploadButton from "./UploadButton.js";
@@ -10,8 +9,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Alert from "react-bootstrap/Alert";
 
-class App extends Component {
-  render() {
+function Results() {
   return (
     <>
       <Navigation />
@@ -26,7 +24,6 @@ class App extends Component {
       <Footer />
     </>
   );
-  }
 }
 
-export default App;
+export default Results;
