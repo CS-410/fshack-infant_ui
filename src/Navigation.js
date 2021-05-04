@@ -121,8 +121,8 @@ function Navigation(props) {
               style={{ filter: "brightness(1) invert(1)" }}
               height="50"
               className="d-inline-block"
-            />{" "}
-            InfantFS UI
+            />
+            {` InfantFS UI`}
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse>
