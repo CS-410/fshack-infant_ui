@@ -1,12 +1,5 @@
 import logo from "./chris-logo2.png";
-import React, {
-  Component,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -17,8 +10,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import Client from "@fnndsc/chrisapi";
-import { render } from "@testing-library/react";
 
 const labelColSize = 3;
 const fieldColSize = 9;
@@ -34,9 +27,9 @@ function LoginModal(props) {
       const authUrl = process.env.REACT_APP_API_URL + "auth-token/";
       const username = usernameRef.current.value;
       const password = passwordRef.current.value;
-      // const authToken = await Client.getAuthToken(authUrl, username, password);
-      // window.sessionStorage.setItem("username", username);
-      // window.sessionStorage.setItem("authToken", authToken);
+      const authToken = await Client.getAuthToken(authUrl, username, password);
+      window.sessionStorage.setItem("username", username);
+      window.sessionStorage.setItem("authToken", authToken);
       setLoginFailed(false);
       setUsername(username);
       onHide();
@@ -100,15 +93,21 @@ function Navigation(props) {
   function Login() {
     return (
       <Nav>
-        <Nav.Link href="#login" onClick={() => setloginModalVisibility(true)}>
-          Login
-        </Nav.Link>
+        <Nav.Link onClick={() => setloginModalVisibility(true)}>Login</Nav.Link>
       </Nav>
     );
   }
 
-  function Welcome() {
-    return <Nav>Welcome {username}!</Nav>;
+  function Logout() {
+    return (
+      <Nav>
+        <NavDropdown title={username} id="nav-dropdown">
+          <NavDropdown.Item onSelect={() => setUsername("")}>
+            Logout
+          </NavDropdown.Item>
+        </NavDropdown>
+      </Nav>
+    );
   }
 
   return (
@@ -134,7 +133,7 @@ function Navigation(props) {
                 <Nav.Link>Results</Nav.Link>
               </LinkContainer>
             </Nav>
-            {username ? Welcome() : Login()}
+            {username ? Logout() : Login()}
           </Navbar.Collapse>
         </Container>
       </Navbar>
