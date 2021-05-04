@@ -1,5 +1,7 @@
 import logo from "./chris-logo2.png";
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { LinkContainer } from "react-router-bootstrap";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
@@ -110,7 +112,7 @@ class Navigation extends Component {
         </Nav.Link>
       </Nav>
     );
-  };
+  }
 
   render() {
     return (
@@ -129,8 +131,12 @@ class Navigation extends Component {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse>
               <Nav className="navbar-nav me-auto">
-                <Nav.Link href="#home">Home</Nav.Link>
-                <Nav.Link href="#results">Results</Nav.Link>
+                <LinkContainer to="/">
+                  <Nav.Link>Home</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/results">
+                  <Nav.Link>Results</Nav.Link>
+                </LinkContainer>
               </Nav>
               {this.Login()}
             </Navbar.Collapse>

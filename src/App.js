@@ -1,31 +1,30 @@
 import "./App.css";
-import React, { Component } from 'react';
-
+import React from "react";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import Navigation from "./Navigation.js";
-import UploadButton from "./UploadButton.js";
 import Footer from "./Footer.js";
-import Overview from "./Overview.js";
+import Results from "./Results";
+import Home from "./Home";
 
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Alert from "react-bootstrap/Alert";
-
-class App extends Component {
+class App extends React.Component {
   render() {
-  return (
-    <>
-      <Navigation />
-      <br />
-      <br />
-      <Container>
-        <Row>
-          <Overview />
-          <UploadButton />
-        </Row>
-      </Container>
-      <Footer />
-    </>
-  );
+    return (
+      <Router>
+        <Navigation />
+        <br />
+        <br />
+        {this.props.children}
+        <Footer />
+        <Switch>
+          <Route path="/results">
+            <Results />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
+    );
   }
 }
 

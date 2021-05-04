@@ -6,14 +6,15 @@ import Overview from "./Overview.js";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
-function Results() {
+function Home() {
   return (
     <Container>
       <Row>
-        <h1>Results page</h1>
+        <Overview />
+        <UploadButton />
       </Row>
     </Container>
   );
 }
 
-export default Results;
+export default Home;
