@@ -41,17 +41,10 @@ function LoginModal(props: LoginModalProps): JSX.Element {
         password = passwordRef.current.value;
       }
 
-      // TODO: I put this here for testing purposes and to not remove the import above
-      // We can take out the code from the if statement to test using the ChRIS API
-      if (false) {
-        const authToken = await Client.getAuthToken(
-          authUrl,
-          username,
-          password
-        );
-        window.sessionStorage.setItem("username", username);
-        window.sessionStorage.setItem("authToken", authToken);
-      }
+      debugger;
+      const authToken = await Client.getAuthToken(authUrl, username, password);
+      window.sessionStorage.setItem("username", username);
+      window.sessionStorage.setItem("authToken", authToken);
 
       setLoginFailed(false);
       setUsername(username);
