@@ -20,14 +20,14 @@ import '../css/Navigation.css';
 interface LoginProps {
 	show: boolean;
 	onHide: () => void;
-	setUsername: React.Dispatch<React.SetStateAction<string>>;
+	setLocalUsername: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function LoginModal(props: LoginProps): JSX.Element {
 	const labelColSize = 3;
 	const fieldColSize = 9;
 
-	const { show, onHide, setUsername } = props;
+	const { show, onHide, setLocalUsername } = props;
 	const [loginFailed, setLoginFailed] = useState(false);
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
@@ -42,10 +42,10 @@ function LoginModal(props: LoginProps): JSX.Element {
 				username,
 				password
 			);
-			window.sessionStorage.setItem("username", username);
-			window.sessionStorage.setItem("authToken", authToken);
+			window.localStorage.setItem("username", username);
+			window.localStorage.setItem("authToken", authToken);
+			setLocalUsername(username);
 			setLoginFailed(false);
-			setUsername(username);
 			onHide();
 		} catch (error) {
 			setLoginFailed(true);
@@ -105,27 +105,38 @@ function LoginModal(props: LoginProps): JSX.Element {
 }
 
 function Navigation(): JSX.Element {
-	const [username, setUsername] = useState("");
+	const [localUsername, setLocalUsername] = useState("");
 	const [showLogin, setShowLogin] = useState(false);
 
-	function loggedOut(): JSX.Element {
-		return (
-			<Nav>
-				<Nav.Link onClick={() => setShowLogin(true)}>Login</Nav.Link>
-			</Nav>
-		);
-	}
-
-	function loggedIn() {
-		return (
-			<Nav id="logoutButton">
-				<NavDropdown id="" title={username}>
-					<NavDropdown.Item onSelect={() => setUsername("")}>
-						Logout
-					</NavDropdown.Item>
-				</NavDropdown>
-			</Nav>
-		);
+	function loginStatus(): JSX.Element {
+		const storedUsername = window.localStorage.getItem("username");
+		if (localUsername === "" && storedUsername) {
+			setLocalUsername(storedUsername);
+		}
+		if (localUsername) {
+			return (
+				<Nav id="logoutButton">
+					<NavDropdown id="" title={localUsername}>
+						<NavDropdown.Item
+							onSelect={() => {
+								setLocalUsername("");
+								window.localStorage.clear();
+							}}
+						>
+							Logout
+						</NavDropdown.Item>
+					</NavDropdown>
+				</Nav>
+			);
+		} else {
+			return (
+				<Nav>
+					<Nav.Link onClick={() => setShowLogin(true)}>
+						Login
+					</Nav.Link>
+				</Nav>
+			);
+		}
 	}
 
 	return (
@@ -151,14 +162,14 @@ function Navigation(): JSX.Element {
 								<Nav.Link>Results</Nav.Link>
 							</LinkContainer>
 						</Nav>
-						{username ? loggedIn() : loggedOut()}
+						{loginStatus()}
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
 			<LoginModal
 				show={showLogin}
 				onHide={() => setShowLogin(false)}
-				setUsername={setUsername}
+				setLocalUsername={setLocalUsername}
 			/>
 		</>
 	);
