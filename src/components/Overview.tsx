@@ -2,7 +2,7 @@ import Col from "react-bootstrap/Col";
 
 function Overview(): JSX.Element {
 	return (
-		<Col xs={7}>
+		<Col md={7}>
 			<h2>Background</h2>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim

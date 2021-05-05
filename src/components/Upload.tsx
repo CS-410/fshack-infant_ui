@@ -6,22 +6,50 @@ import FormLabel from "react-bootstrap/FormLabel";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 
+import ClientSingleton from "../ClientSingleton";
+
 import brainImage from "../assets/brain.svg";
 
 function Upload(): JSX.Element {
 	const [selectedFile, setSelectedFile] = useState<File>();
+	const instance = ClientSingleton.getInstance();
 
 	function onFileUpload(): void {
-		/*let client = new Client(bruhUrl, { token: authToken });
-      client.uploadFile({
-        "upload_path": `cube/uploads/fsi/test.txt`
-      }, {
-        "fname": selectedFile
-      })*/
+		const client = instance.getClient();
+		const username = instance.getUsername();
+		const filename = selectedFile.name;
+		client.uploadFile(
+			{
+				upload_path: username + "/uploads/pl-fshack-infant/" + filename,
+			},
+			{
+				fname: filename,
+			}
+		);
 	}
 
 	function onFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
 		setSelectedFile(event.target.files[0]);
+	}
+
+	function butt(): JSX.Element {
+		if (instance.isAuthorized()) {
+			return (
+				<Button
+					variant="success"
+					onClick={onFileUpload}
+					style={{ width: "100%" }}
+				>
+					Continue
+				</Button>
+			);
+		} else {
+			return (
+				<Button variant="danger" style={{ width: "100%" }} disabled>
+					Login first
+				</Button>
+			);
+		}
 	}
 
 	return (
@@ -57,13 +85,7 @@ function Upload(): JSX.Element {
 						<>
 							<hr />
 							<div className="d-flex justify-content-center">
-								<Button
-									variant="success"
-									onClick={onFileUpload}
-									style={{ width: "100%" }}
-								>
-									Continue
-								</Button>
+								{butt()}
 							</div>
 						</>
 					)}
