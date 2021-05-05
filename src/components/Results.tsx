@@ -1,9 +1,8 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
+import { Container, Row } from "react-bootstrap";
 
 function Results(): JSX.Element {
 	return (
-		<Container>
+		<Container className="py-3">
 			<Row>
 				<h1>Results page</h1>
 			</Row>
