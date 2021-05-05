@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { LinkContainer } from "react-router-bootstrap";
+import { useSharedState } from "../State";
 
+import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import LoginModal from "./LoginModal";
 
 import chrisLogo from "../assets/chrisLogo.png";
 import "../css/Navigation.css";
-import LoginModal from "./LoginModal";
 
 function Navigation(): JSX.Element {
-	const [localUsername, setLocalUsername] = useState("");
-	const [showLogin, setShowLogin] = useState(false);
+	const [state, setState] = useSharedState();
 
 	function loginStatus(): JSX.Element {
-		const storedUsername = window.localStorage.getItem("username");
-		if (localUsername === "" && storedUsername) {
-			setLocalUsername(storedUsername);
-		}
-		if (localUsername) {
+		/*const username = window.localStorage.getItem("username");
+		if (!state.username && username) {
+			setState((prev: any) => ({ ...prev, username: username }));
+		}*/
+
+		if (state.username) {
 			return (
 				<Nav id="logoutButton">
-					<NavDropdown id="" title={localUsername}>
+					<NavDropdown id="" title={state.username}>
 						<NavDropdown.Item
 							onSelect={() => {
-								setLocalUsername("");
+								setState((prev: any) => ({ ...prev, username: "" }));
 								window.localStorage.clear();
 							}}
 						>
@@ -34,7 +34,7 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={() => setShowLogin(true)}>
+					<Nav.Link onClick={() => setState((prev: any) => ({ ...prev, showLogin: true }))}>
 						Login
 					</Nav.Link>
 				</Nav>
@@ -80,9 +80,8 @@ function Navigation(): JSX.Element {
 				</Container>
 			</Navbar>
 			<LoginModal
-				show={showLogin}
-				onHide={() => setShowLogin(false)}
-				setLocalUsername={setLocalUsername}
+				show={state.showLogin}
+				onHide={() => setState((prev: any) => ({ ...prev, showLogin: false }))}
 			/>
 		</>
 	);

@@ -3,6 +3,7 @@ import { createContainer } from "react-tracked";
 
 const initialState = {
 	username: "",
+	showLogin: false,
     selectedFile: null
 };
 

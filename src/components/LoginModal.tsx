@@ -1,19 +1,18 @@
 import React, { useState } from "react";
+import { useSharedState } from '../State';
+
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
+
 import "../css/Navigation.css";
 
 interface LoginProps {
 	show: boolean;
 	onHide: () => void;
-	setLocalUsername: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function LoginModal(props: LoginProps): JSX.Element {
-	const labelColSize = 3;
-	const fieldColSize = 9;
-
-	const { show, onHide, setLocalUsername } = props;
+	const [state, setState] = useSharedState();
 	const [loginFailed, setLoginFailed] = useState(false);
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
@@ -30,14 +29,17 @@ function LoginModal(props: LoginProps): JSX.Element {
 			);
 			window.localStorage.setItem("username", username);
 			window.localStorage.setItem("authToken", authToken);
-			setLocalUsername(username);
+			setState((prev: any) => ({ ...prev, username: username }));
 			setLoginFailed(false);
-			onHide();
+			props.onHide();
 		} catch (error) {
 			setLoginFailed(true);
 			console.log(error);
 		}
 	}
+
+	const labelColSize = 3;
+	const fieldColSize = 9;
 
 	const usernameField = (
 		<Form.Group as={Row}>
@@ -92,7 +94,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 
 	const modalFooter = (
 		<Modal.Footer>
-			<Button variant="outline-danger" onClick={onHide}>
+			<Button variant="outline-danger" onClick={props.onHide}>
 				Close
 			</Button>
 			<Button variant="success" onClick={onLogin}>
@@ -102,7 +104,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 	);
 
 	return (
-		<Modal show={show} onHide={onHide} centered>
+		<Modal show={props.show} onHide={props.onHide} centered>
 			{modalHeader}
 			{modalBody}
 			{modalFooter}
