@@ -12,6 +12,7 @@ import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Client from "@fnndsc/chrisapi";
+import "./Navigation.css";
 
 const labelColSize = 3;
 const fieldColSize = 9;
@@ -100,8 +101,8 @@ function Navigation(props) {
 
   function Logout() {
     return (
-      <Nav>
-        <NavDropdown title={username} id="nav-dropdown">
+      <Nav id="logoutButton">
+        <NavDropdown title={username}>
           <NavDropdown.Item onSelect={() => setUsername("")}>
             Logout
           </NavDropdown.Item>
