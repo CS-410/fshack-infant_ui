@@ -24,7 +24,7 @@ function Footer(): JSX.Element {
 			<div
 				style={{
 					background: `url(${footerImage}) no-repeat`,
-					backgroundSize: 'cover',
+					backgroundSize: "cover",
 				}}
 			>
 				<br />

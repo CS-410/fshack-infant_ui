@@ -1,1 +1,1 @@
-declare module '@fnndsc/chrisapi';
+declare module "@fnndsc/chrisapi";

@@ -34,7 +34,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 
 	async function onLogin(): Promise<void> {
 		try {
-			const authUrl = process.env.REACT_APP_API_URL + 'auth-token/';
+			const authUrl = process.env.REACT_APP_API_URL + "auth-token/";
 			const username = usernameRef.current.value;
 			const password = passwordRef.current.value;
 			const authToken = await Client.getAuthToken(
@@ -42,8 +42,8 @@ function LoginModal(props: LoginProps): JSX.Element {
 				username,
 				password
 			);
-			window.sessionStorage.setItem('username', username);
-			window.sessionStorage.setItem('authToken', authToken);
+			window.sessionStorage.setItem("username", username);
+			window.sessionStorage.setItem("authToken", authToken);
 			setLoginFailed(false);
 			setUsername(username);
 			onHide();
@@ -105,7 +105,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 }
 
 function Navigation(): JSX.Element {
-	const [username, setUsername] = useState('');
+	const [username, setUsername] = useState("");
 	const [showLogin, setShowLogin] = useState(false);
 
 	function loggedOut(): JSX.Element {
@@ -120,7 +120,7 @@ function Navigation(): JSX.Element {
 		return (
 			<Nav id="logoutButton">
 				<NavDropdown id="" title={username}>
-					<NavDropdown.Item onSelect={() => setUsername('')}>
+					<NavDropdown.Item onSelect={() => setUsername("")}>
 						Logout
 					</NavDropdown.Item>
 				</NavDropdown>
@@ -135,7 +135,7 @@ function Navigation(): JSX.Element {
 					<Navbar.Brand>
 						<img
 							src={chrisLogo}
-							style={{ filter: 'brightness(1) invert(1)' }}
+							style={{ filter: "brightness(1) invert(1)" }}
 							height="50"
 							className="d-inline-block"
 						/>
