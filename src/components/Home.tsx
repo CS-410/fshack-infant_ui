@@ -1,13 +1,11 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-
+import { Container, Row } from "react-bootstrap";
 import Upload from "./Upload";
 import Overview from "./Overview";
 
 function Home(): JSX.Element {
 	return (
-		<Container>
-			<Row>
+		<Container className="py-3">
+			<Row className="align-items-center">
 				<Overview />
 				<Upload />
 			</Row>

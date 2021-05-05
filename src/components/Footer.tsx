@@ -1,13 +1,16 @@
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
-
+import { Container, Nav, Navbar } from "react-bootstrap";
 import footerImage from "../assets/nodes.svg";
 
 function Footer(): JSX.Element {
 	return (
-		<div className="fixed-bottom">
-			<Navbar bg="light" expand="sm">
+		<footer
+			className="pb-5"
+			style={{
+				background: `url(${footerImage}) no-repeat`,
+				backgroundSize: "cover",
+			}}
+		>
+			<Navbar bg="light">
 				<Container>
 					<Navbar.Collapse className="justify-content-end">
 						<Nav>
@@ -21,18 +24,7 @@ function Footer(): JSX.Element {
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
-			<div
-				style={{
-					background: `url(${footerImage}) no-repeat`,
-					backgroundSize: "cover",
-				}}
-			>
-				<br />
-				<br />
-				<br />
-				<br />
-			</div>
-		</div>
+		</footer>
 	);
 }
 

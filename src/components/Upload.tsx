@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-
-import Container from "react-bootstrap/Container";
-import Col from "react-bootstrap/Col";
-import FormLabel from "react-bootstrap/FormLabel";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
+import {
+	Alert,
+	Button,
+	Col,
+	Container,
+	FormLabel,
+	Image,
+} from "react-bootstrap";
 
 import ClientSingleton from "../ClientSingleton";
 
@@ -53,24 +55,20 @@ function Upload(): JSX.Element {
 	}
 
 	return (
-		<Col>
+		<Col md={5}>
 			<Container>
-				<Alert variant="primary" className="text-center">
-					<br />
+				<Alert variant="primary" className="text-center py-3">
 					{selectedFile && (
 						<h5>
 							<b>Selected file:</b> {selectedFile.name}
 						</h5>
 					)}
-					<br />
-					<img
+					<Image
 						style={{ filter: "brightness(0) invert(1)" }}
 						src={brainImage}
 						width="50%"
+						className="mb-3"
 					/>
-					<br />
-					<br />
-					<br />
 					<FormLabel className="btn btn-lg btn-primary">
 						<input
 							type="file"
@@ -79,8 +77,6 @@ function Upload(): JSX.Element {
 						/>
 						Upload <b>.NII</b> or <b>.DCM</b> dataset
 					</FormLabel>
-					<br />
-					<br />
 					{selectedFile && (
 						<>
 							<hr />

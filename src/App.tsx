@@ -1,9 +1,8 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
-import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
+import Navigation from "./components/Navigation";
 import Results from "./components/Results";
 
 class App extends React.Component {
@@ -11,10 +10,6 @@ class App extends React.Component {
 		return (
 			<Router>
 				<Navigation />
-				<br />
-				<br />
-				{this.props.children}
-				<Footer />
 				<Switch>
 					<Route path="/results">
 						<Results />
@@ -23,8 +18,11 @@ class App extends React.Component {
 						<Home />
 					</Route>
 				</Switch>
+				{this.props.children}
+				<Footer />
 			</Router>
 		);
 	}
 }
+
 export default App;
