@@ -1,6 +1,6 @@
 {
 	"name": "pl-fshack-infant_ui",
-	"version": "0.5",
+	"version": "0.5.0",
 	"private": true,
 	"dependencies": {
 		"@fnndsc/chrisapi": "^1.5.0",

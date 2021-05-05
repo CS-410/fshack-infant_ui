@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { createContainer } from "react-tracked";
 
-const initialState = {
+export interface State {
+	username: string;
+	showLogin: boolean;
+	selectedFile: any;
+}
+
+export const initialState: State = {
 	username: "",
 	showLogin: false,
-    selectedFile: null
+	selectedFile: null,
 };
 
-const useMyState = () => useState(initialState);
+const useMyState = () => useState<State>(initialState);
 
 export const {
 	Provider: SharedStateProvider,

@@ -1,4 +1,4 @@
-import { useSharedState } from "../State";
+import { initialState, State, useSharedState } from "../State";
 
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
@@ -6,26 +6,48 @@ import LoginModal from "./LoginModal";
 
 import chrisLogo from "../assets/chrisLogo.png";
 import "../css/Navigation.css";
+import { MouseEventHandler, useEffect } from "react";
+import { SelectCallback } from "react-bootstrap/esm/helpers";
 
 function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
 
-	function loginStatus(): JSX.Element {
-		/*const username = window.localStorage.getItem("username");
-		if (!state.username && username) {
-			setState((prev: any) => ({ ...prev, username: username }));
-		}*/
+	useEffect(() => {
+		setState((previous: State) => {
+			const username = window.localStorage.getItem("username");
 
+			return {
+				...previous,
+				username,
+			};
+		});
+	}, [state.username, setState]);
+
+	const handleLogout: SelectCallback = () => {
+		setState((previous: State) => {
+			return {
+				...previous,
+				username: initialState.username,
+			};
+		});
+		window.localStorage.clear();
+	};
+
+	const handleLogin: MouseEventHandler<HTMLAnchorElement> = () => {
+		setState((previous: State) => {
+			return {
+				...previous,
+				showLogin: true,
+			};
+		});
+	};
+
+	function loginStatus(): JSX.Element {
 		if (state.username) {
 			return (
 				<Nav id="logoutButton">
 					<NavDropdown id="" title={state.username}>
-						<NavDropdown.Item
-							onSelect={() => {
-								setState((prev: any) => ({ ...prev, username: "" }));
-								window.localStorage.clear();
-							}}
-						>
+						<NavDropdown.Item onSelect={handleLogout}>
 							Logout
 						</NavDropdown.Item>
 					</NavDropdown>
@@ -34,12 +56,19 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={() => setState((prev: any) => ({ ...prev, showLogin: true }))}>
-						Login
-					</Nav.Link>
+					<Nav.Link onClick={handleLogin}>Login</Nav.Link>
 				</Nav>
 			);
 		}
+	}
+
+	function handleLoginModal(): void {
+		setState((previous: State) => {
+			return {
+				...previous,
+				showLogin: false,
+			};
+		});
 	}
 
 	const navbarBrand = (
@@ -79,10 +108,7 @@ function Navigation(): JSX.Element {
 					{navbarCollapse}
 				</Container>
 			</Navbar>
-			<LoginModal
-				show={state.showLogin}
-				onHide={() => setState((prev: any) => ({ ...prev, showLogin: false }))}
-			/>
+			<LoginModal show={state.showLogin} onHide={handleLoginModal} />
 		</>
 	);
 }

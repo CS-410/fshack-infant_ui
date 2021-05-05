@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSharedState } from '../State';
+import { State, useSharedState } from "../State";
 
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
@@ -27,9 +27,15 @@ function LoginModal(props: LoginProps): JSX.Element {
 				username,
 				password
 			);
+
 			window.localStorage.setItem("username", username);
 			window.localStorage.setItem("authToken", authToken);
-			setState((prev: any) => ({ ...prev, username: username }));
+			setState((previous: State) => {
+				return {
+					...previous,
+					username: username,
+				};
+			});
 			setLoginFailed(false);
 			props.onHide();
 		} catch (error) {
