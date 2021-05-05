@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import React, { useState } from "react";
+import { LinkContainer } from "react-router-bootstrap";
 
-import Client from '@fnndsc/chrisapi';
+import Client from "@fnndsc/chrisapi";
 
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Container from 'react-bootstrap/Container';
-import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Alert from 'react-bootstrap/Alert';
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Container from "react-bootstrap/Container";
+import Modal from "react-bootstrap/Modal";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 
-import chrisLogo from '../assets/chrisLogo.png';
-import '../css/Navigation.css';
+import chrisLogo from "../assets/chrisLogo.png";
+import "../css/Navigation.css";
 
 interface LoginProps {
 	show: boolean;

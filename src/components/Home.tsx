@@ -1,8 +1,8 @@
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
 
-import Upload from './Upload';
-import Overview from './Overview';
+import Upload from "./Upload";
+import Overview from "./Overview";
 
 function Home(): JSX.Element {
 	return (
