@@ -1,13 +1,15 @@
-import Button from "react-bootstrap/Button";
+import React, { useState } from "react";
+
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
-import Alert from "react-bootstrap/Alert";
-import BrainImage from "./brain.svg";
 import FormLabel from "react-bootstrap/FormLabel";
-import React, { Component, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 
-function UploadButton(): JSX.Element {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+import brainImage from "../assets/brain.svg";
+
+function Upload(): JSX.Element {
+  const [selectedFile, setSelectedFile] = useState<File>();
 
   function onFileUpload(): void {
     /*let client = new Client(bruhUrl, { token: authToken });
@@ -19,10 +21,7 @@ function UploadButton(): JSX.Element {
   }
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    if (event.target && event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setSelectedFile(file);
-    }
+      setSelectedFile(event.target.files[0]);
   }
 
   return (
@@ -38,7 +37,7 @@ function UploadButton(): JSX.Element {
           <br />
           <img
             style={{ filter: "brightness(0) invert(1)" }}
-            src={BrainImage}
+            src={brainImage}
             width="50%"
           />
           <br />
@@ -70,4 +69,4 @@ function UploadButton(): JSX.Element {
   );
 }
 
-export default UploadButton;
+export default Upload;

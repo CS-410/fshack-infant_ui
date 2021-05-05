@@ -1,10 +1,10 @@
-import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Navigation from './Navigation';
-import Footer from './Footer';
-import Results from './Results';
-import Home from './Home';
+
+import Navigation from './components/Navigation';
+import Footer from './components/Footer';
+import Home from './components/Home';
+import Results from './components/Results';
 
 class App extends React.Component {
 	render(): JSX.Element {

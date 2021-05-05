@@ -1,31 +1,18 @@
-import Info from './Info';
-import Navigation from './Navigation';
-import UploadButton from './UploadButton';
-import Footer from './Footer';
-import '../index.css'
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
 
-import Client from '@fnndsc/chrisapi';
+import Upload from './Upload';
+import Overview from './Overview';
 
 function Home(): JSX.Element {
 	return (
-		<div className="page-container">
-		<div className="content-wrap">
-
-			<div >
-				<div className="Home">
-					<Navigation />
-					<Info />
-					<UploadButton />	
-				</div>
-			</div>
-
-		</div>
-
-		<Footer />
-		</div>
+		<Container>
+			<Row>
+				<Overview />
+				<Upload />
+			</Row>
+		</Container>
 	);
 }
 
 export default Home;
-
-/*style={{ backgroundImage: `url(${Background})` }}*/ 

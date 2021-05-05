@@ -1,11 +1,13 @@
-
-import Navigation from './Navigation';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
 
 function Results(): JSX.Element {
 	return (
-		<div className="results">
-			<p>This is the Results component.</p>
-		</div>
+		<Container>
+			<Row>
+				<h1>Results page</h1>
+			</Row>
+		</Container>
 	);
 }
 
