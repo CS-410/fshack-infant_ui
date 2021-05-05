@@ -4,8 +4,8 @@ import Overview from "./Overview";
 
 function Home(): JSX.Element {
 	return (
-		<Container className="py-3">
-			<Row className="align-items-center">
+		<Container className="py-5">
+			<Row>
 				<Overview />
 				<Upload />
 			</Row>

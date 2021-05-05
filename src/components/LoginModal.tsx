@@ -39,7 +39,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 		}
 	}
 
-	const usernameComponent = (
+	const usernameField = (
 		<Form.Group as={Row}>
 			<Form.Label column sm={labelColSize}>
 				Username
@@ -54,7 +54,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 		</Form.Group>
 	);
 
-	const passwordComponent = (
+	const passwordField = (
 		<Form.Group as={Row}>
 			<Form.Label column sm={labelColSize}>
 				Password
@@ -83,8 +83,9 @@ function LoginModal(props: LoginProps): JSX.Element {
 				</Alert>
 			)}
 			<Form>
-				{usernameComponent}
-				{passwordComponent}
+				{usernameField}
+				<br />
+				{passwordField}
 			</Form>
 		</Modal.Body>
 	);
