@@ -3,7 +3,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
 
-function Footer() {
+function Footer(): JSX.Element {
   return (
     <div className="fixed-bottom">
       <Navbar bg="light" expand="sm">

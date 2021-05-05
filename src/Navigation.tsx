@@ -14,23 +14,45 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Client from "@fnndsc/chrisapi";
 import "./Navigation.css";
 
-const labelColSize = 3;
-const fieldColSize = 9;
+interface LoginModalProps {
+  show: boolean;
+  onHide: () => void;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+}
 
-function LoginModal(props) {
-  const { setUsername, show, onHide } = props;
-  const usernameRef = React.createRef();
-  const passwordRef = React.createRef();
+function LoginModal(props: LoginModalProps): JSX.Element {
+  const { show, onHide, setUsername } = props;
+  const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
+  const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
   const [loginFailed, setLoginFailed] = useState(false);
 
-  async function handleLogin() {
+  const labelColSize = 3;
+  const fieldColSize = 9;
+
+  async function handleLogin(): Promise<void> {
     try {
       const authUrl = process.env.REACT_APP_API_URL + "auth-token/";
-      const username = usernameRef.current.value;
-      const password = passwordRef.current.value;
-      const authToken = await Client.getAuthToken(authUrl, username, password);
-      window.sessionStorage.setItem("username", username);
-      window.sessionStorage.setItem("authToken", authToken);
+      var username = "";
+      var password = "";
+      if (usernameRef !== null && usernameRef.current) {
+        username = usernameRef.current.value;
+      }
+      if (passwordRef !== null && passwordRef.current) {
+        password = passwordRef.current.value;
+      }
+
+      // TODO: I put this here for testing purposes and to not remove the import above
+      // We can take out the code from the if statement to test using the ChRIS API
+      if (false) {
+        const authToken = await Client.getAuthToken(
+          authUrl,
+          username,
+          password
+        );
+        window.sessionStorage.setItem("username", username);
+        window.sessionStorage.setItem("authToken", authToken);
+      }
+
       setLoginFailed(false);
       setUsername(username);
       onHide();
@@ -41,7 +63,7 @@ function LoginModal(props) {
   }
 
   return (
-    <Modal show={show} onHide={onHide} size="md" centered>
+    <Modal show={show} onHide={onHide} centered>
       <Modal.Header>
         <Modal.Title>Log into ChRIS</Modal.Title>
       </Modal.Header>
@@ -87,11 +109,11 @@ function LoginModal(props) {
   );
 }
 
-function Navigation(props) {
+function Navigation(): JSX.Element {
   const [loginModalVisibility, setloginModalVisibility] = useState(false);
   const [username, setUsername] = useState("");
 
-  function Login() {
+  function Login(): JSX.Element {
     return (
       <Nav>
         <Nav.Link onClick={() => setloginModalVisibility(true)}>Login</Nav.Link>
@@ -102,7 +124,7 @@ function Navigation(props) {
   function Logout() {
     return (
       <Nav id="logoutButton">
-        <NavDropdown title={username}>
+        <NavDropdown id="logoutDropdown" title={username}>
           <NavDropdown.Item onSelect={() => setUsername("")}>
             Logout
           </NavDropdown.Item>
@@ -140,7 +162,9 @@ function Navigation(props) {
       </Navbar>
       <LoginModal
         show={loginModalVisibility}
-        onHide={() => setloginModalVisibility(false)}
+        onHide={() => {
+          setloginModalVisibility(false);
+        }}
         setUsername={setUsername}
       />
     </>

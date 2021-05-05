@@ -1,6 +1,6 @@
 import Col from "react-bootstrap/Col";
 
-function Overview() {
+function Overview(): JSX.Element {
   return (
     <Col xs={7}>
       <h2>Background</h2>

@@ -1,20 +1,16 @@
 import "./App.css";
 
-import UploadButton from "./UploadButton.js";
-import Overview from "./Overview.js";
-
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
-function Home() {
+function Results(): JSX.Element {
   return (
     <Container>
       <Row>
-        <Overview />
-        <UploadButton />
+        <h1>Results page</h1>
       </Row>
     </Container>
   );
 }
 
-export default Home;
+export default Results;
