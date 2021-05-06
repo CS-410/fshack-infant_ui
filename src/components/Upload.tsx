@@ -2,6 +2,7 @@ import React from "react";
 import { State, useSharedState } from "../State";
 
 import ClientSingleton from "../ClientSingleton";
+import WorkflowModal from "./WorkflowModal";
 
 import {
 	Alert,
@@ -19,7 +20,7 @@ function Upload(): JSX.Element {
 
 	function onFileUpload(): void {
 		const client = ClientSingleton.getInstance();
-		client.uploadFile(
+		/*const uploadedFile = client.uploadFile(
 			{
 				upload_path:
 					state.username +
@@ -29,7 +30,22 @@ function Upload(): JSX.Element {
 			{
 				fname: state.selectedFile,
 			}
-		);
+		);*/
+		setState((previous: State) => {
+			return {
+				...previous,
+				showWorkflow: true,
+			};
+		});
+	}
+
+	function handleWorkflowModal(): void {
+		setState((previous: State) => {
+			return {
+				...previous,
+				showWorkflow: false,
+			};
+		});
 	}
 
 	function onFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -42,8 +58,11 @@ function Upload(): JSX.Element {
 	}
 
 	function validateFile(): boolean {
-		const fileExt = state.selectedFile.name.split('.').pop();
-		return (fileExt === "nii" || fileExt === "dcm") && state.selectedFile.size !== 0;
+		const fileExt = state.selectedFile.name.split(".").pop();
+		return (
+			(fileExt === "nii" || fileExt === "dcm") &&
+			state.selectedFile.size !== 0
+		);
 	}
 
 	function actionButton(): JSX.Element {
@@ -83,39 +102,45 @@ function Upload(): JSX.Element {
 	}
 
 	return (
-		<Col md={5}>
-			<Container className="py-3">
-				<Alert variant="primary" className="text-center py-3">
-					{state.selectedFile && (
-						<h5>
-							<b>Selected file:</b> {state.selectedFile.name}
-						</h5>
-					)}
-					<Image
-						style={{ filter: "brightness(0) invert(1)" }}
-						src={brainImage}
-						width="50%"
-						className="mb-3"
-					/>
-					<FormLabel className="btn btn-lg btn-primary">
-						<input
-							type="file"
-							onChange={onFileChange}
-							className="d-none"
+		<>
+			<Col md={5}>
+				<Container className="py-3">
+					<Alert variant="primary" className="text-center py-3">
+						{state.selectedFile && (
+							<h5>
+								<b>Selected file:</b> {state.selectedFile.name}
+							</h5>
+						)}
+						<Image
+							style={{ filter: "brightness(0) invert(1)" }}
+							src={brainImage}
+							width="50%"
+							className="mb-3"
 						/>
-						Upload <b>.NII</b> or <b>.DCM</b> dataset
-					</FormLabel>
-					{state.selectedFile && (
-						<>
-							<hr />
-							<div className="justify-content-center">
-								{actionButton()}
-							</div>
-						</>
-					)}
-				</Alert>
-			</Container>
-		</Col>
+						<FormLabel className="btn btn-lg btn-primary">
+							<input
+								type="file"
+								onChange={onFileChange}
+								className="d-none"
+							/>
+							Upload <b>.NII</b> or <b>.DCM</b> dataset
+						</FormLabel>
+						{state.selectedFile && (
+							<>
+								<hr />
+								<div className="justify-content-center">
+									{actionButton()}
+								</div>
+							</>
+						)}
+					</Alert>
+				</Container>
+			</Col>
+			<WorkflowModal
+				show={state.showWorkflow}
+				onHide={handleWorkflowModal}
+			/>
+		</>
 	);
 }
 

@@ -44,7 +44,7 @@ function Navigation(): JSX.Element {
 		if (state.username) {
 			return (
 				<Nav id="logoutButton">
-					<NavDropdown title={state.username} id="">
+					<NavDropdown title={<b>{state.username}</b>} id="">
 						<NavDropdown.Item onSelect={handleLogout}>
 							Logout
 						</NavDropdown.Item>
@@ -54,7 +54,7 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={handleLogin}>Login</Nav.Link>
+					<Nav.Link onClick={handleLogin}><b>Login</b></Nav.Link>
 				</Nav>
 			);
 		}
