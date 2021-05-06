@@ -1,4 +1,6 @@
+import { MouseEventHandler, useEffect } from "react";
 import { initialState, State, useSharedState } from "../State";
+import { SelectCallback } from "react-bootstrap/esm/helpers";
 
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
@@ -6,8 +8,6 @@ import LoginModal from "./LoginModal";
 
 import chrisLogo from "../assets/chrisLogo.png";
 import "../css/Navigation.css";
-import { MouseEventHandler, useEffect } from "react";
-import { SelectCallback } from "react-bootstrap/esm/helpers";
 
 function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
@@ -15,7 +15,6 @@ function Navigation(): JSX.Element {
 	useEffect(() => {
 		setState((previous: State) => {
 			const username = window.localStorage.getItem("username");
-
 			return {
 				...previous,
 				username,

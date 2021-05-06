@@ -8,12 +8,13 @@ import "../css/Navigation.css";
 
 interface LoginProps {
 	show: boolean;
-	onHide: () => void;
+	onHide(): void;
 }
 
 function LoginModal(props: LoginProps): JSX.Element {
 	const [state, setState] = useSharedState();
-	const [loginFailed, setLoginFailed] = useState(false);
+	const [invalidLogin, setInvalidLogin] = useState(false);
+
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 
@@ -27,7 +28,6 @@ function LoginModal(props: LoginProps): JSX.Element {
 				username,
 				password
 			);
-
 			window.localStorage.setItem("username", username);
 			window.localStorage.setItem("authToken", authToken);
 			setState((previous: State) => {
@@ -36,10 +36,10 @@ function LoginModal(props: LoginProps): JSX.Element {
 					username: username,
 				};
 			});
-			setLoginFailed(false);
+			setInvalidLogin(false);
 			props.onHide();
 		} catch (error) {
-			setLoginFailed(true);
+			setInvalidLogin(true);
 			console.log(error);
 		}
 	}
@@ -85,7 +85,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 
 	const modalBody = (
 		<Modal.Body>
-			{loginFailed && (
+			{invalidLogin && (
 				<Alert variant="danger">
 					Invalid login credentials! Please try again.
 				</Alert>
