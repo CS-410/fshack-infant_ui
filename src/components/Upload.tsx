@@ -1,6 +1,8 @@
 import React from "react";
 import { State, useSharedState } from "../State";
 
+import ClientSingleton from "../ClientSingleton";
+
 import {
 	Alert,
 	Button,
@@ -10,8 +12,6 @@ import {
 	Image,
 } from "react-bootstrap";
 
-import ClientSingleton from "../ClientSingleton";
-
 import brainImage from "../assets/brain.svg";
 
 function Upload(): JSX.Element {
@@ -19,14 +19,15 @@ function Upload(): JSX.Element {
 
 	function onFileUpload(): void {
 		const client = ClientSingleton.getInstance();
-		const username = state.username;
-		const filename = state.selectedFile.name;
 		client.uploadFile(
 			{
-				upload_path: username + "/uploads/pl-fshack-infant/" + filename,
+				upload_path:
+					state.username +
+					"/uploads/pl-fshack-infant/" +
+					state.selectedFile.name,
 			},
 			{
-				fname: filename,
+				fname: state.selectedFile,
 			}
 		);
 	}
@@ -53,8 +54,12 @@ function Upload(): JSX.Element {
 			);
 		} else {
 			return (
-				<Button variant="danger" style={{ width: "100%" }} disabled>
-					Please login first
+				<Button
+					variant="outline-danger"
+					style={{ width: "100%" }}
+					disabled
+				>
+					Login to continue
 				</Button>
 			);
 		}
