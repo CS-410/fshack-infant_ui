@@ -41,8 +41,14 @@ function Upload(): JSX.Element {
 		});
 	}
 
+	function validateFile(): boolean {
+		const fileExt = state.selectedFile.name.split('.').pop();
+		return (fileExt === "nii" || fileExt === "dcm") && state.selectedFile.size !== 0;
+	}
+
 	function actionButton(): JSX.Element {
-		if (state.username) {
+		const validFile: boolean = validateFile();
+		if (state.username && validFile) {
 			return (
 				<Button
 					variant="success"
@@ -50,6 +56,17 @@ function Upload(): JSX.Element {
 					style={{ width: "100%" }}
 				>
 					Continue
+				</Button>
+			);
+		} else if (!validFile) {
+			return (
+				<Button
+					variant="danger"
+					onClick={onFileUpload}
+					style={{ width: "100%" }}
+					disabled
+				>
+					Invalid file, try again
 				</Button>
 			);
 		} else {
@@ -67,7 +84,7 @@ function Upload(): JSX.Element {
 
 	return (
 		<Col md={5}>
-			<Container>
+			<Container className="py-3">
 				<Alert variant="primary" className="text-center py-3">
 					{state.selectedFile && (
 						<h5>
@@ -91,7 +108,7 @@ function Upload(): JSX.Element {
 					{state.selectedFile && (
 						<>
 							<hr />
-							<div className="d-flex justify-content-center">
+							<div className="justify-content-center">
 								{actionButton()}
 							</div>
 						</>
