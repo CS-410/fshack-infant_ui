@@ -1,6 +1,5 @@
-import { MouseEventHandler, useEffect } from "react";
+import { useEffect } from "react";
 import { initialState, State, useSharedState } from "../State";
-import { SelectCallback } from "react-bootstrap/esm/helpers";
 
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
@@ -12,17 +11,16 @@ import "../css/Navigation.css";
 function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
 
-	useEffect(() => {
+	function handleLogin(): void {
 		setState((previous: State) => {
-			const username = window.localStorage.getItem("username");
 			return {
 				...previous,
-				username,
+				showLogin: true,
 			};
 		});
-	}, [state.username, setState]);
+	};
 
-	const handleLogout: SelectCallback = () => {
+	function handleLogout(): void {
 		setState((previous: State) => {
 			return {
 				...previous,
@@ -32,20 +30,21 @@ function Navigation(): JSX.Element {
 		window.localStorage.clear();
 	};
 
-	const handleLogin: MouseEventHandler<HTMLAnchorElement> = () => {
+	useEffect(() => {
 		setState((previous: State) => {
+			const storedUsername = window.localStorage.getItem("username");
 			return {
 				...previous,
-				showLogin: true,
+				username: storedUsername,
 			};
 		});
-	};
+	}, [state.username, setState]);
 
 	function loginStatus(): JSX.Element {
 		if (state.username) {
 			return (
 				<Nav id="logoutButton">
-					<NavDropdown id="" title={state.username}>
+					<NavDropdown title={state.username} id="">
 						<NavDropdown.Item onSelect={handleLogout}>
 							Logout
 						</NavDropdown.Item>

@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
+import { State, useSharedState } from "../State";
+
 import {
 	Alert,
 	Button,
@@ -13,13 +15,12 @@ import ClientSingleton from "../ClientSingleton";
 import brainImage from "../assets/brain.svg";
 
 function Upload(): JSX.Element {
-	const [selectedFile, setSelectedFile] = useState<File>();
-	const instance = ClientSingleton.getInstance();
+	const [state, setState] = useSharedState();
 
 	function onFileUpload(): void {
-		const client = instance.getClient();
-		const username = instance.getUsername();
-		const filename = selectedFile.name;
+		const client = ClientSingleton.getInstance();
+		const username = state.username;
+		const filename = state.selectedFile.name;
 		client.uploadFile(
 			{
 				upload_path: username + "/uploads/pl-fshack-infant/" + filename,
@@ -31,11 +32,16 @@ function Upload(): JSX.Element {
 	}
 
 	function onFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
-		setSelectedFile(event.target.files[0]);
+		setState((previous: State) => {
+			return {
+				...previous,
+				selectedFile: event.target.files[0],
+			};
+		});
 	}
 
-	function butt(): JSX.Element {
-		if (instance.isAuthorized()) {
+	function actionButton(): JSX.Element {
+		if (state.username) {
 			return (
 				<Button
 					variant="success"
@@ -48,7 +54,7 @@ function Upload(): JSX.Element {
 		} else {
 			return (
 				<Button variant="danger" style={{ width: "100%" }} disabled>
-					Login first
+					Please login first
 				</Button>
 			);
 		}
@@ -58,9 +64,9 @@ function Upload(): JSX.Element {
 		<Col md={5}>
 			<Container>
 				<Alert variant="primary" className="text-center py-3">
-					{selectedFile && (
+					{state.selectedFile && (
 						<h5>
-							<b>Selected file:</b> {selectedFile.name}
+							<b>Selected file:</b> {state.selectedFile.name}
 						</h5>
 					)}
 					<Image
@@ -77,11 +83,11 @@ function Upload(): JSX.Element {
 						/>
 						Upload <b>.NII</b> or <b>.DCM</b> dataset
 					</FormLabel>
-					{selectedFile && (
+					{state.selectedFile && (
 						<>
 							<hr />
 							<div className="d-flex justify-content-center">
-								{butt()}
+								{actionButton()}
 							</div>
 						</>
 					)}
