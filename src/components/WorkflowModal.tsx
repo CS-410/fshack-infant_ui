@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { State, useSharedState } from "../State";
 
 import { Button, Modal, Spinner } from "react-bootstrap";
-import ClientSingleton from "../ClientSingleton";
+import ClientSingleton from "../api/ClientSingleton";
 import { IPluginCreateData } from "@fnndsc/chrisapi";
 
 interface ModalProps {

@@ -1,7 +1,7 @@
 import React from "react";
 import { State, useSharedState } from "../State";
 
-import ClientSingleton from "../ClientSingleton";
+import ClientSingleton from "../api/ClientSingleton";
 import WorkflowModal from "./WorkflowModal";
 
 import {
