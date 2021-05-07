@@ -18,20 +18,26 @@ import brainImage from "../assets/brain.svg";
 function Upload(): JSX.Element {
 	const [state, setState] = useSharedState();
 
-	function onFileUpload(): void {
-		const client = ClientSingleton.getInstance();
-		/*const uploadedFile = client.uploadFile(
+	async function onFileUpload(): Promise<void> {
+		const client = await ClientSingleton.getInstance();
+		const uploadedFile = await client.uploadFile(
 			{
-				upload_path:
-					state.username +
+				upload_path: state.username +
 					"/uploads/pl-fshack-infant/" +
 					state.selectedFile.name,
 			},
 			{
 				fname: state.selectedFile,
 			}
-		);*/
-		showWorkflowModal();
+		);
+		setState((previous: State) => {
+			return {
+				...previous,
+				uploadedFile: uploadedFile,
+				showWorkflow: true,
+				
+			};
+		});
 	}
 
 	function hideWorkflowModal(): void {
@@ -39,15 +45,6 @@ function Upload(): JSX.Element {
 			return {
 				...previous,
 				showWorkflow: false,
-			};
-		});
-	}
-
-	function showWorkflowModal(): void {
-		setState((previous: State) => {
-			return {
-				...previous,
-				showWorkflow: true,
 			};
 		});
 	}

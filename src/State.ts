@@ -5,7 +5,8 @@ export interface State {
 	username: string;
 	showLogin: boolean;
 	showWorkflow: boolean;
-	selectedFile: any;
+	selectedFile: File;
+	uploadedFile: any;
 }
 
 export const initialState: State = {
@@ -13,6 +14,7 @@ export const initialState: State = {
 	showLogin: false,
 	showWorkflow: false,
 	selectedFile: null,
+	uploadedFile: null,
 };
 
 const useMyState = () => useState<State>(initialState);
