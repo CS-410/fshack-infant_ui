@@ -31,19 +31,23 @@ function Upload(): JSX.Element {
 				fname: state.selectedFile,
 			}
 		);*/
-		setState((previous: State) => {
-			return {
-				...previous,
-				showWorkflow: true,
-			};
-		});
+		showWorkflowModal();
 	}
 
-	function handleWorkflowModal(): void {
+	function hideWorkflowModal(): void {
 		setState((previous: State) => {
 			return {
 				...previous,
 				showWorkflow: false,
+			};
+		});
+	}
+
+	function showWorkflowModal(): void {
+		setState((previous: State) => {
+			return {
+				...previous,
+				showWorkflow: true,
 			};
 		});
 	}
@@ -138,7 +142,7 @@ function Upload(): JSX.Element {
 			</Col>
 			<WorkflowModal
 				show={state.showWorkflow}
-				onHide={handleWorkflowModal}
+				onHide={hideWorkflowModal}
 			/>
 		</>
 	);

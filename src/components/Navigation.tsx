@@ -11,15 +11,6 @@ import "../css/Navigation.css";
 function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
 
-	function handleLogin(): void {
-		setState((previous: State) => {
-			return {
-				...previous,
-				showLogin: true,
-			};
-		});
-	};
-
 	function handleLogout(): void {
 		setState((previous: State) => {
 			return {
@@ -54,13 +45,23 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={handleLogin}><b>Login</b></Nav.Link>
+					<Nav.Link onClick={showLoginModal}><b>Login</b></Nav.Link>
 				</Nav>
 			);
 		}
 	}
 
-	function handleLoginModal(): void {
+
+	function showLoginModal(): void {
+		setState((previous: State) => {
+			return {
+				...previous,
+				showLogin: true,
+			};
+		});
+	};
+
+	function hideLoginModal(): void {
 		setState((previous: State) => {
 			return {
 				...previous,
@@ -106,7 +107,7 @@ function Navigation(): JSX.Element {
 					{navbarCollapse}
 				</Container>
 			</Navbar>
-			<LoginModal show={state.showLogin} onHide={handleLoginModal} />
+			<LoginModal show={state.showLogin} onHide={hideLoginModal} />
 		</>
 	);
 }
