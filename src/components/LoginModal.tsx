@@ -5,13 +5,9 @@ import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 
 import "../css/Navigation.css";
+import { ModalProps } from "./WorkflowModal";
 
-interface LoginProps {
-	show: boolean;
-	onHide(): void;
-}
-
-function LoginModal(props: LoginProps): JSX.Element {
+function LoginModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
 	const [invalidLogin, setInvalidLogin] = useState(false);
 
@@ -20,7 +16,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 
 	async function onLogin(): Promise<void> {
 		try {
-			const authUrl = process.env.REACT_APP_API_URL + "auth-token/";
+			const authUrl = `${process.env.REACT_APP_API_URL}auth-token/`;
 			const username = usernameRef.current.value;
 			const password = passwordRef.current.value;
 			const authToken = await Client.getAuthToken(

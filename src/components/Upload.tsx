@@ -1,7 +1,7 @@
 import React from "react";
 import { State, useSharedState } from "../State";
 
-import ClientSingleton from "../ClientSingleton";
+import ClientSingleton from "../api/ClientSingleton";
 import WorkflowModal from "./WorkflowModal";
 
 import {
@@ -20,7 +20,7 @@ function Upload(): JSX.Element {
 
 	function onFileUpload(): void {
 		const client = ClientSingleton.getInstance();
-		/*const uploadedFile = client.uploadFile(
+		const uploadedFile = client.uploadFile(
 			{
 				upload_path:
 					state.username +
@@ -30,11 +30,13 @@ function Upload(): JSX.Element {
 			{
 				fname: state.selectedFile,
 			}
-		);*/
+		);
+
 		setState((previous: State) => {
 			return {
 				...previous,
 				showWorkflow: true,
+				uploadedFile: uploadedFile,
 			};
 		});
 	}
@@ -57,7 +59,7 @@ function Upload(): JSX.Element {
 		});
 	}
 
-	function validateFile(): boolean {
+	function isFileValid(): boolean {
 		const fileExt = state.selectedFile.name.split(".").pop();
 		return (
 			(fileExt === "nii" || fileExt === "dcm") &&
@@ -66,7 +68,7 @@ function Upload(): JSX.Element {
 	}
 
 	function actionButton(): JSX.Element {
-		const validFile: boolean = validateFile();
+		const validFile: boolean = isFileValid();
 		if (state.username && validFile) {
 			return (
 				<Button
@@ -79,12 +81,7 @@ function Upload(): JSX.Element {
 			);
 		} else if (!validFile) {
 			return (
-				<Button
-					variant="danger"
-					onClick={onFileUpload}
-					style={{ width: "100%" }}
-					disabled
-				>
+				<Button variant="danger" style={{ width: "100%" }} disabled>
 					Invalid file, try again
 				</Button>
 			);
