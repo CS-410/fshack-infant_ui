@@ -8,6 +8,15 @@ function Home(): JSX.Element {
 			<Row>
 				<Overview />
 				<Upload />
+				<p>
+					<button
+						id="toggle"
+						type="button"
+						className="btn btn-success"
+					>
+						Toggle Complete
+					</button>
+				</p>
 			</Row>
 		</Container>
 	);

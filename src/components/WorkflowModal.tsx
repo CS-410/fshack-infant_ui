@@ -56,6 +56,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			outputFileStem: `${uploadedFileName}.png`,
 			sliceToConvert: 0,
 		};
+		debugger;
 		const med2imgInstance = await client.createPluginInstance(
 			med2imgPlugin.data.id,
 			med2imgArguments
