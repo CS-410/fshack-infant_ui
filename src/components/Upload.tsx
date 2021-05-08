@@ -109,7 +109,14 @@ function Upload(): JSX.Element {
 					<Alert variant="primary" className="text-center py-3">
 						{state.selectedFile && (
 							<h5>
-								<b>Selected file:</b> {state.selectedFile.name}
+								<b>Selected file:</b> { function(){
+										if (state.selectedFile.name.length > 17){
+											const nam = state.selectedFile.name;
+											return (nam.substring(0, 14) + "" + nam.substring(nam.length - 4));
+										} else {
+											return state.selectedFile.name;
+										}
+									} }
 							</h5>
 						)}
 						<Image
