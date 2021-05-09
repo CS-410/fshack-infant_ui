@@ -22,7 +22,8 @@ function Upload(): JSX.Element {
 		const client = await ClientSingleton.getInstance();
 		const uploadedFile = await client.uploadFile(
 			{
-				upload_path: state.username +
+				upload_path:
+					state.username +
 					"/uploads/pl-fshack-infant/" +
 					state.selectedFile.name,
 			},
@@ -35,7 +36,6 @@ function Upload(): JSX.Element {
 				...previous,
 				uploadedFile: uploadedFile,
 				showWorkflow: true,
-				
 			};
 		});
 	}
@@ -109,14 +109,14 @@ function Upload(): JSX.Element {
 					<Alert variant="primary" className="text-center py-3">
 						{state.selectedFile && (
 							<h5>
-								<b>Selected file:</b> { function(){
-										if (state.selectedFile.name.length > 17){
-											const nam = state.selectedFile.name;
-											return (nam.substring(0, 14) + "" + nam.substring(nam.length - 4));
-										} else {
-											return state.selectedFile.name;
-										}
-									} }
+								<b>Selected file:</b>{" "}
+								{state.selectedFile.name.length > 17
+									? state.selectedFile.name.substring(0, 17) +
+									  " (...) " +
+									  state.selectedFile.name.substring(
+											state.selectedFile.name.length - 4
+									  )
+									: state.selectedFile.name}
 							</h5>
 						)}
 						<Image
