@@ -8,6 +8,9 @@ function Footer(): JSX.Element {
 			style={{
 				background: `url(${footerImage}) no-repeat`,
 				backgroundSize: "cover",
+				position: "fixed",
+				bottom: "0",
+				width: "100%"
 			}}
 		>
 			<Navbar bg="light">
