@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { State, useSharedState } from "../State";
 
-import { Button, Modal, Spinner } from "react-bootstrap";
 import ClientSingleton from "../api/ClientSingleton";
 import { IPluginCreateData } from "@fnndsc/chrisapi";
+
+import { Button, Modal, Spinner } from "react-bootstrap";
 
 interface ModalProps {
 	show: boolean;

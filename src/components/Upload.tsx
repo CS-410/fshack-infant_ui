@@ -12,7 +12,6 @@ import {
 	FormLabel,
 	Image,
 } from "react-bootstrap";
-
 import brainImage from "../assets/brain.svg";
 
 function Upload(): JSX.Element {
