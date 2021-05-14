@@ -27,6 +27,27 @@ interface IMedImgData extends IPluginCreateData {
 	sliceToConvert: number;
 }
 
+interface IReportData extends IPluginCreateData {
+	file_name: string;
+	report_name: string;
+	report_types: string;
+	LUT: string;
+}
+
+/*****************************************
+              Feed hierarchy
+ *****************************************
+        ⬤:0          pl-dircopy
+        │
+        │
+        ↓
+        ⬤:1          pl-fshack-infant
+        │
+        │
+        ↓
+        ⬤:2          pl-mgz2LUT_report
+*****************************************/
+
 function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
 
@@ -77,6 +98,24 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		const infantfsInstance = await client.createPluginInstance(
 			infantfsPlugin.data.id,
 			infantfsArguments
+		);
+
+		// child node: pl-mgz2LUT_report
+		const reportLookup = await client.getPlugins({
+			name: "pl-mgz2LUT_report",
+		});
+		const reportPlugin = await reportLookup.getItems()[0];
+		const reportArguments: IReportData = {
+			previous_id: infantfsInstance.data.id,
+			title: "Report",
+			file_name: "recon/mri/aparc+aseg.mgz",
+			report_name: "aparc+aseg.mgz",
+			report_types: "txt,html,pdf",
+			LUT: "FreeSurferColorLUT.txt",
+		};
+		const reportInstance = await client.createPluginInstance(
+			reportPlugin.data.id,
+			reportArguments
 		);
 	}
 
