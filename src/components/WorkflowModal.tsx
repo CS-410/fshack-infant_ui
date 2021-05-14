@@ -34,6 +34,15 @@ interface IReportData extends IPluginCreateData {
 	LUT: string;
 }
 
+interface IMultipassData extends IPluginCreateData {
+	commonArgs: string;
+	specificArgs: string;
+	splitExpr: string;
+	exec: string;
+	noJobLogging: boolean;
+	verbose: string;
+}
+
 /*****************************************
               Feed hierarchy
  *****************************************
@@ -45,7 +54,7 @@ interface IReportData extends IPluginCreateData {
         │
         │
         ↓
-        ⬤:2          pl-mgz2LUT_report
+        ⬤:2          pl-multipass
 *****************************************/
 
 function WorkflowModal(props: ModalProps): JSX.Element {
@@ -100,22 +109,26 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			infantfsArguments
 		);
 
-		// child node: pl-mgz2LUT_report
-		const reportLookup = await client.getPlugins({
-			name: "pl-mgz2LUT_report",
+		// child node: pl-multipass
+		const multipassLookup = await client.getPlugins({
+			name: "pl-multipass",
 		});
-		const reportPlugin = await reportLookup.getItems()[0];
-		const reportArguments: IReportData = {
+		const multipassPlugin = await multipassLookup.getItems()[0];
+		const multipassArguments: IMultipassData = {
 			previous_id: infantfsInstance.data.id,
-			title: "Report",
-			file_name: "recon/mri/aparc+aseg.mgz",
-			report_name: "aparc+aseg.mgz",
-			report_types: "txt,html,pdf",
-			LUT: "FreeSurferColorLUT.txt",
+			title: "Generate images",
+			commonArgs:
+				"--printElapsedTime --verbosity 5 --saveImages --skipAllLabels --outputFileStem sample --outputFileType png",
+			specificArgs:
+				"--wholeVolume brainVolume --fileFilter brain ++ --wholeVolume segVolume --fileFilter aparc+aseg --lookupTable __fs__ ++ --wholeVolume segVolume --fileFilter DKT --lookupTable __fs__ ++ --wholeVolume segVolume --fileFilter a2009 --lookupTable __fs__",
+			splitExpr: "++",
+			exec: "pfdo_mgz2image",
+			noJobLogging: false,
+			verbose: "1",
 		};
-		const reportInstance = await client.createPluginInstance(
-			reportPlugin.data.id,
-			reportArguments
+		const multipassInstance = await client.createPluginInstance(
+			multipassPlugin.data.id,
+			multipassArguments
 		);
 	}
 
