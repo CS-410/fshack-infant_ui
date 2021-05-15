@@ -111,7 +111,7 @@ declare module "@fnndsc/chrisapi" {
     /**
      * Fetch a user's login authorization token from the REST API.
      * @param {string} authUrl - url of the authorization service
-     * @param {string} username - username 
+     * @param {string} username - username
      * @param {string} password - password
      * @param {number} [timeout=30000] - request timeout
      *
@@ -214,7 +214,7 @@ declare module "@fnndsc/chrisapi" {
 
     /**
      * Upload a file and create a new uploaded file resource through the REST API.
-     * 
+     *
      * @param {data} IRequestData
      * @param {uploadFileObj} IUploadFileObj
      */
@@ -866,7 +866,9 @@ declare module "@fnndsc/chrisapi" {
      */
     getFiles: (params?: IParams, timeout?: number) => Promise<PluginInstanceFileList>;
 
-    getComputeResource: (timeout?: number) => Promise<any>
+    getComputeResource: (timeout?: number) => Promise<any>;
+
+    delete: (timeout?: number) => Promise<null>;
   }
 
   /**
@@ -1079,7 +1081,7 @@ declare module "@fnndsc/chrisapi" {
      * @param {?Object} params - search parameters
      * @return {Object} - JS Promise, resolves to an ``axios reponse`` object
      */
-    get: (url: string, params?: object) => Promise<any>; // Promise<IAxiosReponse> 
+    get: (url: string, params?: object) => Promise<any>; // Promise<IAxiosReponse>
 
     /**
      * Perform a POST request.

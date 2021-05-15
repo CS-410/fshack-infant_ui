@@ -50,10 +50,10 @@ function Results(): JSX.Element {
 		const isNew = creationDate.isAfter(moment().subtract(2, "days"));
 
 		let status: JSX.Element;
-		const hasStartedJobs: boolean = feed.data.started_jobs != 0;
-		const hasWaitingJobs: boolean = feed.data.waiting_jobs != 0;
-		const hasErroredJobs: boolean = feed.data.errored_jobs != 0;
-		const hasCancelledJobs: boolean = feed.data.cancelled_jobs != 0;
+		const hasStartedJobs: boolean = feed.data.started_jobs !== 0;
+		const hasWaitingJobs: boolean = feed.data.waiting_jobs !== 0;
+		const hasErroredJobs: boolean = feed.data.errored_jobs !== 0;
+		const hasCancelledJobs: boolean = feed.data.cancelled_jobs !== 0;
 
 		const iconSize = 24;
 		if (
