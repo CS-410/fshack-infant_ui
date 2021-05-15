@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { createContainer } from "react-tracked";
+import { UploadedFile } from "@fnndsc/chrisapi";
 
 export interface State {
 	username: string;
 	showLogin: boolean;
 	showWorkflow: boolean;
 	selectedFile: File;
-	uploadedFile: any;
+	uploadedFile: UploadedFile;
 }
 
 export const initialState: State = {

@@ -1,9 +1,7 @@
 import React from "react";
 import { State, useSharedState } from "../State";
-
 import ClientSingleton from "../api/ClientSingleton";
 import WorkflowModal from "./WorkflowModal";
-
 import {
 	Alert,
 	Button,
@@ -21,7 +19,8 @@ function Upload(): JSX.Element {
 		const client = await ClientSingleton.getInstance();
 		const uploadedFile = await client.uploadFile(
 			{
-				upload_path: state.username +
+				upload_path:
+					state.username +
 					"/uploads/pl-fshack-infant/" +
 					state.selectedFile.name,
 			},
@@ -34,7 +33,6 @@ function Upload(): JSX.Element {
 				...previous,
 				uploadedFile: uploadedFile,
 				showWorkflow: true,
-				
 			};
 		});
 	}
@@ -57,7 +55,7 @@ function Upload(): JSX.Element {
 		});
 	}
 
-	function validateFile(): boolean {
+	function isValidFile(): boolean {
 		const fileExt = state.selectedFile.name.split(".").pop();
 		return (
 			(fileExt === "nii" || fileExt === "dcm") &&
@@ -66,7 +64,7 @@ function Upload(): JSX.Element {
 	}
 
 	function actionButton(): JSX.Element {
-		const validFile: boolean = validateFile();
+		const validFile: boolean = isValidFile();
 		if (state.username && validFile) {
 			return (
 				<Button

@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 import { initialState, State, useSharedState } from "../State";
-
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import LoginModal from "./LoginModal";
-
 import chrisLogo from "../assets/chrisLogo.png";
 import "../css/Navigation.css";
 
@@ -19,7 +17,7 @@ function Navigation(): JSX.Element {
 			};
 		});
 		window.localStorage.clear();
-	};
+	}
 
 	useEffect(() => {
 		setState((previous: State) => {
@@ -45,12 +43,13 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={showLoginModal}><b>Login</b></Nav.Link>
+					<Nav.Link onClick={showLoginModal}>
+						<b>Login</b>
+					</Nav.Link>
 				</Nav>
 			);
 		}
 	}
-
 
 	function showLoginModal(): void {
 		setState((previous: State) => {
@@ -59,7 +58,7 @@ function Navigation(): JSX.Element {
 				showLogin: true,
 			};
 		});
-	};
+	}
 
 	function hideLoginModal(): void {
 		setState((previous: State) => {
@@ -70,7 +69,7 @@ function Navigation(): JSX.Element {
 		});
 	}
 
-	const navbarBrand = (
+	const navbarBrand: JSX.Element = (
 		<Navbar.Brand>
 			<Image
 				src={chrisLogo}
@@ -84,14 +83,22 @@ function Navigation(): JSX.Element {
 		</Navbar.Brand>
 	);
 
-	const navbarCollapse = (
+	function resultsButton(): JSX.Element {
+		if (state.username) {
+			return <Nav.Link>Results</Nav.Link>;
+		} else {
+			return <Nav.Link disabled>Results</Nav.Link>;
+		}
+	}
+
+	const navbarCollapse: JSX.Element = (
 		<Navbar.Collapse>
 			<Nav className="navbar-nav me-auto">
 				<LinkContainer to="/">
 					<Nav.Link>Home</Nav.Link>
 				</LinkContainer>
 				<LinkContainer to="/results">
-					<Nav.Link>Results</Nav.Link>
+					{resultsButton()}
 				</LinkContainer>
 			</Nav>
 			{loginStatus()}

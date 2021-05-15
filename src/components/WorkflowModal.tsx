@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import { State, useSharedState } from "../State";
-
+import { initialState, State, useSharedState } from "../State";
 import ClientSingleton from "../api/ClientSingleton";
 import { IPluginCreateData } from "@fnndsc/chrisapi";
-
 import { Button, Modal, Spinner } from "react-bootstrap";
 
 interface ModalProps {
@@ -83,9 +81,16 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 
 	useEffect(() => {
 		if (state.username && state.uploadedFile) {
+			setState((previous: State) => {
+				return {
+					...previous,
+					selectedFile: initialState.selectedFile,
+					uploadedFile: initialState.uploadedFile,
+				};
+			});
 			runWorkflow();
 		}
-	}, [state.showWorkflow, setState]);
+	}, [state.showWorkflow]);
 
 	const modalHeader = (
 		<Modal.Header className="d-flex justify-content-center">

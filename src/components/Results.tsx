@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 import ClientSingleton from "../api/ClientSingleton";
-
 import {
 	Badge,
 	Button,
 	Container,
+	OverlayTrigger,
 	Table,
+	Spinner,
+	Tooltip,
 } from "react-bootstrap";
+import * as Icon from "react-bootstrap-icons";
 import "../css/Results.css";
 
 function Results(): JSX.Element {
@@ -29,38 +32,84 @@ function Results(): JSX.Element {
 		setFeeds(feeds);
 	}
 
-	function tableEntry(feed: any, index: any): JSX.Element {
-		let status = "";
-		if (
-			feed.data.waiting_jobs == 0 &&
-			feed.data.errored_jobs == 0 &&
-			feed.data.cancelled_jobs == 0
-		) {
-			status = "Finished";
-		} else if (feed.data.errored_jobs > 0 || feed.data.cancelled_jobs > 0) {
-			status = "Error";
-		} else if (feed.data.waiting_jobs > 0) {
-			status = "Running";
+	function tableEntry(feed: any, index: number): JSX.Element {
+		function statusIndicator(icon: JSX.Element, text: string): JSX.Element {
+			return (
+				<OverlayTrigger
+					placement="bottom"
+					overlay={<Tooltip id="">{text}</Tooltip>}
+				>
+					{icon}
+				</OverlayTrigger>
+			);
 		}
 
-		let creationDate = moment(feed.data.creation_date);
-		let modificationDate = moment(feed.data.modification_date);
-		let isNew = creationDate.isAfter(moment().subtract(3, "days"));
+		const id = feed.data.id;
+		const creationDate = moment(feed.data.creation_date);
+		const modificationDate = moment(feed.data.modification_date);
+		const isNew = creationDate.isAfter(moment().subtract(2, "days"));
+
+		let status: JSX.Element;
+		const hasStartedJobs: boolean = feed.data.started_jobs != 0;
+		const hasWaitingJobs: boolean = feed.data.waiting_jobs != 0;
+		const hasErroredJobs: boolean = feed.data.errored_jobs != 0;
+		const hasCancelledJobs: boolean = feed.data.cancelled_jobs != 0;
+
+		const iconSize = 24;
+		if (
+			!hasStartedJobs &&
+			!hasWaitingJobs &&
+			!hasCancelledJobs &&
+			!hasErroredJobs
+		) {
+			status = statusIndicator(
+				<Icon.CheckCircleFill
+					size={iconSize}
+					className="text-success"
+				/>,
+				"Finished"
+			);
+		} else if (hasStartedJobs || hasWaitingJobs) {
+			status = statusIndicator(
+				<Spinner size="sm" animation="border" />,
+				"In progress"
+			);
+		} else if (hasCancelledJobs) {
+			status = statusIndicator(
+				<Icon.ExclamationCircleFill
+					size={iconSize}
+					className="text-warning"
+				/>,
+				"Cancelled"
+			);
+		} else if (hasErroredJobs) {
+			status = statusIndicator(
+				<Icon.XCircleFill size={iconSize} className="text-danger" />,
+				"Error"
+			);
+		}
 
 		return (
 			<tr key={index}>
-				<td>{feed.data.id}</td>
+				<td>{id}</td>
 				<td>{feed.data.name}</td>
 				<td>
 					{creationDate.fromNow()}
 					{isNew && (
-						<Badge className="rounded-pill bg-secondary">New</Badge>
+						<>
+							&nbsp;&nbsp;
+							<Badge className="rounded-pill bg-secondary">
+								New
+							</Badge>
+						</>
 					)}
 				</td>
 				<td>{modificationDate.fromNow()}</td>
 				<td>{status}</td>
 				<td>
-					<Button variant="outline-primary">View</Button>
+					<Button href={"/results/" + id} variant="outline-primary">
+						View
+					</Button>
 				</td>
 			</tr>
 		);
