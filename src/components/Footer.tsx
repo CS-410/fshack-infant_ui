@@ -1,5 +1,6 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
 import footerImage from "../assets/nodes.svg";
+import "../css/Footer.css";
 
 function Footer(): JSX.Element {
 	return (
