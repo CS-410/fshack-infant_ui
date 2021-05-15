@@ -37,7 +37,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		const dircopyLookup = await client.getPlugins({ name: "pl-dircopy" });
 		const dircopyPlugin = await dircopyLookup.getItems()[0];
 		const dircopyArguments: IDirCreateData = {
-			title: "InfantFS segmentation analysis",
+			title: "InfantFS analysis",
 			dir: state.uploadedFile.data.fname,
 		};
 		const dircopyInstance = await client.createPluginInstance(
@@ -49,7 +49,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		const med2imgLookup = await client.getPlugins({ name: "pl-med2img" });
 		const med2imgPlugin = await med2imgLookup.getItems()[0];
 		const med2imgArguments: IMedImgData = {
-			title: "Input visual",
+			title: "Input image",
 			previous_id: dircopyInstance.data.id,
 			inputFile: uploadedFileName,
 			outputFileStem: `${uploadedFileName}.png`,
@@ -92,13 +92,13 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		}
 	}, [state.showWorkflow]);
 
-	const modalHeader = (
+	const modalHeader: JSX.Element = (
 		<Modal.Header className="d-flex justify-content-center">
 			<Modal.Title>Preparing brain segmentation analysis...</Modal.Title>
 		</Modal.Header>
 	);
 
-	const modalBody = (
+	const modalBody: JSX.Element = (
 		<Modal.Body className="d-flex justify-content-center">
 			<div className="py-3">
 				<Spinner
@@ -109,7 +109,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		</Modal.Body>
 	);
 
-	const modalFooter = (
+	const modalFooter: JSX.Element = (
 		<Modal.Footer>
 			<Button
 				variant="outline-danger"
