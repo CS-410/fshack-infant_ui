@@ -1,0 +1,11 @@
+.table > :not(caption) > * > * {
+	padding: 1.2rem 1.2rem;
+}
+
+.table {
+	--bs-table-hover-bg: rgba(0, 0, 0, 0.02);
+}
+
+tbody {
+	vertical-align: middle !important;
+}
