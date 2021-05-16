@@ -63,7 +63,6 @@ function Upload(): JSX.Element {
 		);
 	}
 
-<<<<<<< HEAD
 	function truncateLongFileName(name: String): String {
 		const longName = name;
 		const shortenedName =
@@ -76,9 +75,6 @@ function Upload(): JSX.Element {
 	}
 
 	function actionButton(): JSX.Element {
-=======
-	function getActionButton(): JSX.Element {
->>>>>>> 90b0d646abb07172cb67416d549d10de2304f1d0
 		const validFile: boolean = isValidFile();
 		if (state.username && validFile) {
 			return (
