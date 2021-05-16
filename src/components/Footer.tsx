@@ -5,7 +5,7 @@ import "../css/Footer.css";
 function Footer(): JSX.Element {
 	return (
 		<footer
-			className="pb-5"
+			className="pb-6"
 			style={{
 				background: `url(${footerImage}) no-repeat`,
 				backgroundSize: "cover",

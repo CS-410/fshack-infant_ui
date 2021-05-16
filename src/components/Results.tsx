@@ -9,6 +9,7 @@ import {
 	Table,
 	Spinner,
 	Tooltip,
+	Pagination,
 } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import "../css/Results.css";
@@ -32,89 +33,6 @@ function Results(): JSX.Element {
 		setFeeds(feeds);
 	}
 
-	function tableEntry(feed: any, index: number): JSX.Element {
-		function statusIndicator(icon: JSX.Element, text: string): JSX.Element {
-			return (
-				<OverlayTrigger
-					placement="bottom"
-					overlay={<Tooltip id="">{text}</Tooltip>}
-				>
-					{icon}
-				</OverlayTrigger>
-			);
-		}
-
-		const id = feed.data.id;
-		const creationDate = moment(feed.data.creation_date);
-		const modificationDate = moment(feed.data.modification_date);
-		const isNew = creationDate.isAfter(moment().subtract(2, "days"));
-
-		let status: JSX.Element;
-		const hasStartedJobs: boolean = feed.data.started_jobs !== 0;
-		const hasWaitingJobs: boolean = feed.data.waiting_jobs !== 0;
-		const hasErroredJobs: boolean = feed.data.errored_jobs !== 0;
-		const hasCancelledJobs: boolean = feed.data.cancelled_jobs !== 0;
-
-		const iconSize = 24;
-		if (
-			!hasStartedJobs &&
-			!hasWaitingJobs &&
-			!hasCancelledJobs &&
-			!hasErroredJobs
-		) {
-			status = statusIndicator(
-				<Icon.CheckCircleFill
-					size={iconSize}
-					className="text-success"
-				/>,
-				"Finished"
-			);
-		} else if (hasStartedJobs || hasWaitingJobs) {
-			status = statusIndicator(
-				<Spinner size="sm" animation="border" />,
-				"In progress"
-			);
-		} else if (hasCancelledJobs) {
-			status = statusIndicator(
-				<Icon.ExclamationCircleFill
-					size={iconSize}
-					className="text-warning"
-				/>,
-				"Cancelled"
-			);
-		} else if (hasErroredJobs) {
-			status = statusIndicator(
-				<Icon.XCircleFill size={iconSize} className="text-danger" />,
-				"Error"
-			);
-		}
-
-		return (
-			<tr key={index}>
-				<td>{id}</td>
-				<td>{feed.data.name}</td>
-				<td>
-					{creationDate.fromNow()}
-					{isNew && (
-						<>
-							&nbsp;&nbsp;
-							<Badge className="rounded-pill bg-secondary">
-								New
-							</Badge>
-						</>
-					)}
-				</td>
-				<td>{modificationDate.fromNow()}</td>
-				<td>{status}</td>
-				<td>
-					<Button href={"/results/" + id} variant="outline-primary">
-						View
-					</Button>
-				</td>
-			</tr>
-		);
-	}
-
 	useEffect(() => {
 		getFeeds();
 	}, []);
@@ -132,9 +50,90 @@ function Results(): JSX.Element {
 						<th></th>
 					</tr>
 				</thead>
-				<tbody>{feeds.map(tableEntry)}</tbody>
+				<tbody>{feeds.map(getTableEntry)}</tbody>
 			</Table>
 		</Container>
+	);
+}
+
+function getStatusIndicator(icon: JSX.Element, text: string): JSX.Element {
+	return (
+		<OverlayTrigger
+			placement="bottom"
+			overlay={<Tooltip id="">{text}</Tooltip>}
+		>
+			{icon}
+		</OverlayTrigger>
+	);
+}
+
+function getStatus(feed: any): JSX.Element {
+	let status: JSX.Element;
+	const hasStartedJobs: boolean = feed.data.started_jobs !== 0;
+	const hasWaitingJobs: boolean = feed.data.waiting_jobs !== 0;
+	const hasErroredJobs: boolean = feed.data.errored_jobs !== 0;
+	const hasCancelledJobs: boolean = feed.data.cancelled_jobs !== 0;
+
+	const iconSize = 24;
+	if (
+		!hasStartedJobs &&
+		!hasWaitingJobs &&
+		!hasCancelledJobs &&
+		!hasErroredJobs
+	) {
+		status = getStatusIndicator(
+			<Icon.CheckCircleFill size={iconSize} className="text-success" />,
+			"Finished"
+		);
+	} else if (hasStartedJobs || hasWaitingJobs) {
+		status = getStatusIndicator(
+			<Spinner size="sm" animation="border" />,
+			"In progress"
+		);
+	} else if (hasCancelledJobs) {
+		status = getStatusIndicator(
+			<Icon.ExclamationCircleFill
+				size={iconSize}
+				className="text-warning"
+			/>,
+			"Cancelled"
+		);
+	} else if (hasErroredJobs) {
+		status = getStatusIndicator(
+			<Icon.XCircleFill size={iconSize} className="text-danger" />,
+			"Error"
+		);
+	}
+	return status;
+}
+
+function getTableEntry(feed: any, index: number): JSX.Element {
+	const id = feed.data.id;
+	const creationDate = moment(feed.data.creation_date);
+	const modificationDate = moment(feed.data.modification_date);
+	const isNew = creationDate.isAfter(moment().subtract(2, "days"));
+	const status: JSX.Element = getStatus(feed);
+
+	return (
+		<tr key={index}>
+			<td>{id}</td>
+			<td>{feed.data.name}</td>
+			<td>
+				{creationDate.fromNow()}
+				{isNew && (
+					<Badge className="rounded-pill bg-secondary mx-2">
+						New
+					</Badge>
+				)}
+			</td>
+			<td>{modificationDate.fromNow()}</td>
+			<td>{status}</td>
+			<td>
+				<Button href={"/results/" + id} variant="outline-primary">
+					View
+				</Button>
+			</td>
+		</tr>
 	);
 }
 

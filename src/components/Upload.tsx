@@ -63,7 +63,7 @@ function Upload(): JSX.Element {
 		);
 	}
 
-	function actionButton(): JSX.Element {
+	function getActionButton(): JSX.Element {
 		const validFile: boolean = isValidFile();
 		if (state.username && validFile) {
 			return (
@@ -127,7 +127,7 @@ function Upload(): JSX.Element {
 							<>
 								<hr />
 								<div className="justify-content-center">
-									{actionButton()}
+									{getActionButton()}
 								</div>
 							</>
 						)}
