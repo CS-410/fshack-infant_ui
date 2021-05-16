@@ -13,12 +13,13 @@ import {
 } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import "../css/Results.css";
+import { Feed } from "@fnndsc/chrisapi";
 
 function Results(): JSX.Element {
 	const [feeds, setFeeds] = useState([]);
 
 	async function getFeeds(): Promise<void> {
-		let feeds: any = [];
+		let feeds: Feed[] = [];
 
 		const client = await ClientSingleton.getInstance();
 		const infantfsInstances = await client.getPluginInstances({
@@ -56,7 +57,8 @@ function Results(): JSX.Element {
 		nextPage,
 		prevPage
 	);
-	const posts = <tbody>{currentPosts.map(getTableEntry)}</tbody>;
+
+	const posts = currentPosts.map(getTableEntry);
 
 	return (
 		<Container className="py-4">
@@ -71,9 +73,9 @@ function Results(): JSX.Element {
 						<th></th>
 					</tr>
 				</thead>
-				{posts}
-				{pagination}
+				<tbody>{posts}</tbody>
 			</Table>
+			{pagination}
 		</Container>
 	);
 }
@@ -126,12 +128,19 @@ function getStatusIndicator(icon: JSX.Element, text: string): JSX.Element {
 	);
 }
 
-function getStatus(feed: any): JSX.Element {
+function getStatus(feed: Feed): JSX.Element {
+	const {
+		started_jobs,
+		waiting_jobs,
+		errored_jobs,
+		cancelled_jobs,
+	} = feed.data;
+
 	let status: JSX.Element;
-	const hasStartedJobs: boolean = feed.data.started_jobs !== 0;
-	const hasWaitingJobs: boolean = feed.data.waiting_jobs !== 0;
-	const hasErroredJobs: boolean = feed.data.errored_jobs !== 0;
-	const hasCancelledJobs: boolean = feed.data.cancelled_jobs !== 0;
+	const hasStartedJobs = started_jobs !== 0;
+	const hasWaitingJobs = waiting_jobs !== 0;
+	const hasErroredJobs = errored_jobs !== 0;
+	const hasCancelledJobs = cancelled_jobs !== 0;
 
 	const iconSize = 24;
 	if (
@@ -166,17 +175,18 @@ function getStatus(feed: any): JSX.Element {
 	return status;
 }
 
-function getTableEntry(feed: any, index: number): JSX.Element {
-	const id = feed.data.id;
-	const creationDate = moment(feed.data.creation_date);
-	const modificationDate = moment(feed.data.modification_date);
+function getTableEntry(feed: Feed, index: number): JSX.Element {
+	const { id, name, creation_date, modification_date } = feed.data;
+
+	const creationDate = moment(creation_date);
+	const modificationDate = moment(modification_date);
 	const isNew = creationDate.isAfter(moment().subtract(2, "days"));
 	const status: JSX.Element = getStatus(feed);
 
 	return (
 		<tr key={index}>
 			<td>{id}</td>
-			<td>{feed.data.name}</td>
+			<td>{name}</td>
 			<td>
 				{creationDate.fromNow()}
 				{isNew && (
