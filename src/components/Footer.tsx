@@ -25,8 +25,6 @@ function Footer(): JSX.Element {
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
-			<br />
-			<br />
 		</footer>
 	);
 }

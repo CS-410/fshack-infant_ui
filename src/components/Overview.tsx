@@ -1,4 +1,4 @@
-import Col from "react-bootstrap/Col";
+import { Col } from "react-bootstrap";
 
 function Overview(): JSX.Element {
 	return (

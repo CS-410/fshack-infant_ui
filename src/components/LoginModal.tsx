@@ -45,7 +45,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 	const labelColSize = 3;
 	const fieldColSize = 9;
 
-	const usernameField = (
+	const usernameField: JSX.Element = (
 		<Form.Group as={Row}>
 			<Form.Label column sm={labelColSize}>
 				Username
@@ -60,7 +60,7 @@ function LoginModal(props: LoginProps): JSX.Element {
 		</Form.Group>
 	);
 
-	const passwordField = (
+	const passwordField: JSX.Element = (
 		<Form.Group as={Row}>
 			<Form.Label column sm={labelColSize}>
 				Password
@@ -75,13 +75,13 @@ function LoginModal(props: LoginProps): JSX.Element {
 		</Form.Group>
 	);
 
-	const modalHeader = (
+	const modalHeader: JSX.Element = (
 		<Modal.Header>
 			<Modal.Title>Log into ChRIS</Modal.Title>
 		</Modal.Header>
 	);
 
-	const modalBody = (
+	const modalBody: JSX.Element = (
 		<Modal.Body>
 			{invalidLogin && (
 				<Alert variant="danger">
@@ -90,13 +90,12 @@ function LoginModal(props: LoginProps): JSX.Element {
 			)}
 			<Form>
 				{usernameField}
-				<br />
 				{passwordField}
 			</Form>
 		</Modal.Body>
 	);
 
-	const modalFooter = (
+	const modalFooter: JSX.Element = (
 		<Modal.Footer>
 			<Button variant="outline-danger" onClick={props.onHide}>
 				Close
