@@ -2,6 +2,7 @@ import React from "react";
 import { SharedStateProvider } from "./State";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
+import FeedPage from "./components/FeedPage";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import Navigation from "./components/Navigation";
@@ -15,15 +16,10 @@ class App extends React.Component {
 				<Router>
 					<Navigation />
 					<Switch>
-						<Route path="/about">
-							<About />
-						</Route>
-						<Route path="/results">
-							<Results />
-						</Route>
-						<Route path="/">
-							<Home />
-						</Route>
+						<Route path="/about" component={About} />
+						<Route path="/results" component={Results} />
+						<Route path="/" component={Home} />
+						<Route path="/feeds/:id" component={FeedPage} />
 					</Switch>
 					{this.props.children}
 					<Footer />
