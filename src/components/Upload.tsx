@@ -63,6 +63,17 @@ function Upload(): JSX.Element {
 		);
 	}
 
+	function truncateLongFileName(name: String): String {
+		const longName = name;
+		const shortenedName =
+			name.length > 17
+				? name.substring(0, 17) +
+				  " (...) " +
+				  name.substring(name.length - 4)
+				: name;
+		return shortenedName;
+	}
+
 	function actionButton(): JSX.Element {
 		const validFile: boolean = isValidFile();
 		if (state.username && validFile) {
@@ -106,7 +117,9 @@ function Upload(): JSX.Element {
 					<Alert variant="primary" className="text-center py-3">
 						{state.selectedFile && (
 							<h5>
-								<b>Selected file:</b> {state.selectedFile.name}
+								<span title={state.selectedFile.name}>
+									<b>Selected file:</b> {truncateLongFileName(state.selectedFile.name)}
+								</span>
 							</h5>
 						)}
 						<Image
