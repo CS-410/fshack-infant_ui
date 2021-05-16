@@ -5,7 +5,7 @@ import "../css/Footer.css";
 function Footer(): JSX.Element {
 	return (
 		<footer
-			className="pb-6"
+			className="pb-5"
 			style={{
 				background: `url(${footerImage}) no-repeat`,
 				backgroundSize: "cover",
@@ -25,8 +25,6 @@ function Footer(): JSX.Element {
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
-			<br />
-			<br />
 		</footer>
 	);
 }
