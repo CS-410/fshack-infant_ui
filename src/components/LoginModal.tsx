@@ -90,7 +90,6 @@ function LoginModal(props: LoginProps): JSX.Element {
 			)}
 			<Form>
 				{usernameField}
-				<br />
 				{passwordField}
 			</Form>
 		</Modal.Body>

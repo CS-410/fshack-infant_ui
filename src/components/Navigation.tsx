@@ -93,7 +93,7 @@ function Navigation(): JSX.Element {
 
 	const navbarCollapse: JSX.Element = (
 		<Navbar.Collapse>
-			<Nav className="navbar-nav me-auto">
+			<Nav className="navbar-nav mr-auto">
 				<LinkContainer to="/">
 					<Nav.Link>Home</Nav.Link>
 				</LinkContainer>

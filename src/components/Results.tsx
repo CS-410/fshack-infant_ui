@@ -190,7 +190,7 @@ function getTableEntry(feed: Feed, index: number): JSX.Element {
 			<td>
 				{creationDate.fromNow()}
 				{isNew && (
-					<Badge className="rounded-pill bg-secondary mx-2">
+					<Badge className="rounded-pill bg-secondary mx-2 text-white">
 						New
 					</Badge>
 				)}
