@@ -37,8 +37,11 @@ function Results(): JSX.Element {
 		getFeeds();
 	}, []);
 
+	const pagination = getPagination(feeds);
+
 	return (
 		<Container className="py-4">
+			{pagination}
 			<Table hover>
 				<thead>
 					<tr>
@@ -54,6 +57,19 @@ function Results(): JSX.Element {
 			</Table>
 		</Container>
 	);
+}
+
+function getPagination(feeds: any): JSX.Element {
+	let active = 2;
+	let items = [];
+	for (let number = 1; number <= 5; number++) {
+		items.push(
+			<Pagination.Item key={number} active={number === active}>
+				{number}
+			</Pagination.Item>
+		);
+	}
+	return <Pagination>{items}</Pagination>;
 }
 
 function getStatusIndicator(icon: JSX.Element, text: string): JSX.Element {
