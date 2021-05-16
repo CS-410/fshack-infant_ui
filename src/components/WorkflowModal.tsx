@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { initialState, State, useSharedState } from "../State";
 import ClientSingleton from "../api/ClientSingleton";
 import { IPluginCreateData } from "@fnndsc/chrisapi";
-import { Button, Modal, Spinner } from "react-bootstrap";
+import { Button, Modal, ProgressBar, Spinner } from "react-bootstrap";
 
 interface ModalProps {
 	show: boolean;
@@ -23,11 +23,12 @@ interface IFSHackData extends IPluginCreateData {
 interface IMedImgData extends IPluginCreateData {
 	inputFile: string;
 	outputFileStem: string;
-	sliceToConvert: number;
+	sliceToConvert: any;
 }
 
 function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
+	const [stage, setStage] = useState(0);
 
 	async function runWorkflow(): Promise<void> {
 		const client = await ClientSingleton.getInstance();
@@ -44,6 +45,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			dircopyPlugin.data.id,
 			dircopyArguments
 		);
+		setStage(1);
 
 		// child node: pl-med2img
 		const med2imgLookup = await client.getPlugins({ name: "pl-med2img" });
@@ -53,12 +55,13 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			previous_id: dircopyInstance.data.id,
 			inputFile: uploadedFileName,
 			outputFileStem: `${uploadedFileName}.png`,
-			sliceToConvert: 0,
+			sliceToConvert: "m",
 		};
 		const med2imgInstance = await client.createPluginInstance(
 			med2imgPlugin.data.id,
 			med2imgArguments
 		);
+		setStage(2);
 
 		// child node: pl-fshack-infant
 		const infantfsLookup = await client.getPlugins({
@@ -77,15 +80,15 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			infantfsPlugin.data.id,
 			infantfsArguments
 		);
+		setStage(3);
 	}
 
 	useEffect(() => {
-		if (state.username && state.uploadedFile) {
+		if (state.showWorkflow && state.username && state.uploadedFile) {
 			setState((previous: State) => {
 				return {
 					...previous,
 					selectedFile: initialState.selectedFile,
-					uploadedFile: initialState.uploadedFile,
 				};
 			});
 			runWorkflow();
@@ -94,31 +97,59 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 
 	const modalHeader: JSX.Element = (
 		<Modal.Header className="d-flex justify-content-center">
-			<Modal.Title>Preparing brain segmentation analysis...</Modal.Title>
+			<Modal.Title>Preparing analysis...</Modal.Title>
 		</Modal.Header>
 	);
+
+	function workflowStage() {
+		let text, percent, variant;
+		switch (stage) {
+			case 0:
+				text = "Copying file...";
+				percent = 0;
+				break;
+			case 1:
+				text = "Generating image...";
+				percent = 33;
+				break;
+			case 2:
+				text = "Running Infant FreeSurfer...";
+				percent = 66;
+				break;
+			case 3:
+				text = "Feed created successfully! Check the Results page.";
+				percent = 100;
+				variant = "success";
+				//setTimeout(function () {
+				//	props.onHide();
+				//}, 10000);
+				break;
+		}
+		return (
+			<>
+				<div>{text}</div>
+				<div style={{ width: "100%", height: "36px" }}>
+					<ProgressBar
+						style={{ width: "100%", height: "36px" }}
+						animated
+						variant={variant}
+						now={percent}
+					/>
+				</div>
+			</>
+		);
+	}
 
 	const modalBody: JSX.Element = (
 		<Modal.Body className="d-flex justify-content-center">
 			<div className="py-3">
-				<Spinner
+				{workflowStage()}
+				{/*<Spinner
 					animation="border"
 					style={{ width: "8rem", height: "8rem" }}
-				/>
+				/>*/}
 			</div>
 		</Modal.Body>
-	);
-
-	const modalFooter: JSX.Element = (
-		<Modal.Footer>
-			<Button
-				variant="outline-danger"
-				style={{ width: "100%" }}
-				onClick={props.onHide}
-			>
-				Cancel
-			</Button>
-		</Modal.Footer>
 	);
 
 	return (
@@ -126,12 +157,10 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 			show={props.show}
 			onHide={props.onHide}
 			backdrop="static"
-			size="lg"
 			centered
 		>
 			{modalHeader}
 			{modalBody}
-			{modalFooter}
 		</Modal>
 	);
 }
