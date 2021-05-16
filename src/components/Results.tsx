@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 import ClientSingleton from "../api/ClientSingleton";
+import { LinkContainer } from "react-router-bootstrap";
 import {
 	Badge,
 	Button,
@@ -198,9 +199,9 @@ function getTableEntry(feed: Feed, index: number): JSX.Element {
 			<td>{modificationDate.fromNow()}</td>
 			<td>{status}</td>
 			<td>
-				<Button href={"/results/" + id} variant="outline-primary">
-					View
-				</Button>
+				<LinkContainer to={"/feeds/" + id}>
+					<Button variant="outline-primary">View</Button>
+				</LinkContainer>
 			</td>
 		</tr>
 	);
