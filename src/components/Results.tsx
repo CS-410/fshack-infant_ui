@@ -37,11 +37,29 @@ function Results(): JSX.Element {
 		getFeeds();
 	}, []);
 
-	const pagination = getPagination(feeds);
+	const [currentPage, setCurrentPage] = useState(1);
+	const postsPerPage = 5;
+	const indexOfLastPost = currentPage * postsPerPage;
+	const indexOfFirstPost = indexOfLastPost - postsPerPage;
+	const currentPosts = feeds.slice(indexOfFirstPost, indexOfLastPost);
+	const totalPosts = feeds.length;
+
+	const paginate = (pageNum: number) => setCurrentPage(pageNum);
+	const nextPage = () => setCurrentPage(currentPage + 1);
+	const prevPage = () => setCurrentPage(currentPage - 1);
+
+	const pagination = getPagination(
+		currentPage,
+		postsPerPage,
+		totalPosts,
+		paginate,
+		nextPage,
+		prevPage
+	);
+	const posts = <tbody>{currentPosts.map(getTableEntry)}</tbody>;
 
 	return (
 		<Container className="py-4">
-			{pagination}
 			<Table hover>
 				<thead>
 					<tr>
@@ -53,23 +71,48 @@ function Results(): JSX.Element {
 						<th></th>
 					</tr>
 				</thead>
-				<tbody>{feeds.map(getTableEntry)}</tbody>
+				{posts}
+				{pagination}
 			</Table>
 		</Container>
 	);
 }
 
-function getPagination(feeds: any): JSX.Element {
-	let active = 2;
+function getPagination(
+	currentPage: number,
+	postsPerPage: number,
+	totalPosts: number,
+	paginate: (pageNum: number) => void,
+	nextPage: () => void,
+	prevPage: () => void
+): JSX.Element {
+	let active = currentPage;
 	let items = [];
-	for (let number = 1; number <= 5; number++) {
+	const lastPage = Math.ceil(totalPosts / postsPerPage);
+
+	for (let i = 1; i <= lastPage; i++) {
 		items.push(
-			<Pagination.Item key={number} active={number === active}>
-				{number}
+			<Pagination.Item
+				key={i}
+				active={i === active}
+				onClick={() => paginate(i)}
+			>
+				{i}
 			</Pagination.Item>
 		);
 	}
-	return <Pagination>{items}</Pagination>;
+	return (
+		<Pagination>
+			<Pagination.First onClick={() => paginate(1)} />
+			<Pagination.Prev onClick={prevPage} disabled={currentPage === 1} />
+			{items}
+			<Pagination.Next
+				onClick={nextPage}
+				disabled={currentPage === lastPage}
+			/>
+			<Pagination.Last onClick={() => paginate(lastPage)} />
+		</Pagination>
+	);
 }
 
 function getStatusIndicator(icon: JSX.Element, text: string): JSX.Element {
