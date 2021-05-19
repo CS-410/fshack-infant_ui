@@ -74,7 +74,7 @@ function Upload(): JSX.Element {
 		return shortenedName;
 	}
 
-	function actionButton(): JSX.Element {
+	function getActionButton(): JSX.Element {
 		const validFile: boolean = isValidFile();
 		if (state.username && validFile) {
 			return (
@@ -118,7 +118,10 @@ function Upload(): JSX.Element {
 						{state.selectedFile && (
 							<h5>
 								<span title={state.selectedFile.name}>
-									<b>Selected file:</b> {truncateLongFileName(state.selectedFile.name)}
+									<b>Selected file:</b>{" "}
+									{truncateLongFileName(
+										state.selectedFile.name
+									)}
 								</span>
 							</h5>
 						)}
