@@ -40,13 +40,7 @@ function FeedPage(): JSX.Element {
 		let pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
 			fileParams
 		);
-		let files: FeedFile[] = pluginInstanceFiles
-			.getItems()
-			.filter(
-				(file) =>
-					file.data.fname.endsWith("stats") ||
-					file.data.fname.endsWith("png")
-			);
+		let files: FeedFile[] = pluginInstanceFiles.getItems();
 		while (pluginInstanceFiles.hasNextPage) {
 			try {
 				fileParams.offset += fileParams.limit;
@@ -56,6 +50,12 @@ function FeedPage(): JSX.Element {
 				throw new Error("Error while paginating files");
 			}
 		}
+		files = files.filter(
+			(file: FeedFile) =>
+				file.data.fname.endsWith("stats") ||
+				file.data.fname.endsWith("png")
+		);
+
 		let filesWithBlobs: FileWithBlob[] = [];
 		for (let file of files) {
 			const blob: Blob = await file.getFileBlob();
@@ -147,10 +147,12 @@ function FeedPage(): JSX.Element {
 
 									return (
 										<td>
-											<b style={{ color: "red" }}>
-												{`PNG: `}
-											</b>
-											{fname}
+											<p>
+												<b style={{ color: "red" }}>
+													{`PNG: `}
+												</b>
+												{fname}
+											</p>
 											<img src={imageUrl} />
 										</td>
 									);
@@ -159,7 +161,17 @@ function FeedPage(): JSX.Element {
 									var statsUrl = urlCreator.createObjectURL(
 										blob
 									);
-									return <td>{fname}</td>;
+									return (
+										<td>
+											<p>
+												<b style={{ color: "red" }}>
+													{`STATS: `}
+												</b>
+												{fname}
+											</p>
+											<p></p>
+										</td>
+									);
 								}
 								return <td>{fname}</td>;
 							})}
