@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Home from "./components/Home";
 import Navigation from "./components/Navigation";
 import Results from "./components/Results";
+import About from "./components/About";
 
 class App extends React.Component {
 	render(): JSX.Element {
@@ -14,6 +15,9 @@ class App extends React.Component {
 				<Router>
 					<Navigation />
 					<Switch>
+						<Route path="/about">
+							<About />
+						</Route>
 						<Route path="/results">
 							<Results />
 						</Route>
