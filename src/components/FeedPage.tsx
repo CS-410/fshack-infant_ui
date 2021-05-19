@@ -3,8 +3,7 @@ import { Container, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton from "../api/ClientSingleton";
 import {
-	Feed,
-	FeedFileList,
+	FeedFile,
 	PluginInstance,
 	PluginInstanceFileList,
 } from "@fnndsc/chrisapi";
@@ -13,14 +12,14 @@ function FeedPage(): JSX.Element {
 	let params = useParams<{ id: any }>();
 	const { id } = params;
 	const [fshackPlugin, setFshackPlugin] = useState<PluginInstance>(null);
-	const [fshackFiles, setFshackFiles] = useState<any[]>(null);
+	const [fshackFiles, setFshackFiles] = useState<FeedFile[]>(null);
 	const [med2ImgPlugin, setMed2ImgPlugin] = useState<PluginInstance>(null);
-	const [med2ImgFiles, setMed2ImgFiles] = useState<any[]>(null);
+	const [med2ImgFiles, setMed2ImgFiles] = useState<FeedFile[]>(null);
 
 	async function getPluginAndFiles(
 		pluginName: string,
 		pluginSetter: (value: React.SetStateAction<PluginInstance>) => void,
-		fileSetter: (value: React.SetStateAction<any[]>) => void
+		fileSetter: (value: React.SetStateAction<FeedFile[]>) => void
 	): Promise<void> {
 		const client = await ClientSingleton.getInstance();
 		const pluginInstance = await client.getPluginInstances({
@@ -38,8 +37,19 @@ function FeedPage(): JSX.Element {
 				offset: 0,
 			}
 		);
-		const files = pluginInstanceFiles.getItems();
+		const files: FeedFile[] = pluginInstanceFiles.getItems();
 		fileSetter(files);
+
+		console.log("files", files);
+		for (let file of files) {
+			// console.log("file.data", file.data);
+
+			const blob = await file.getFileBlob();
+			console.log("file.getFileBlob()", blob);
+
+			const url = window.URL.createObjectURL(blob);
+			console.log("url", url);
+		}
 	}
 
 	useEffect(() => {
@@ -100,10 +110,8 @@ function FeedPage(): JSX.Element {
 		}
 	}
 
-	function getFilesContents(files: any[]): JSX.Element {
+	function getFilesContents(files: FeedFile[]): JSX.Element {
 		if (files) {
-			console.log(files);
-
 			return (
 				<Table responsive>
 					<thead>
@@ -121,6 +129,7 @@ function FeedPage(): JSX.Element {
 									.pop()
 									.split(".")
 									.pop();
+
 								if (filename.toLowerCase() === "png") {
 									return (
 										<td>
