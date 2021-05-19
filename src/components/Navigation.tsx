@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { initialState, State, useSharedState } from "../State";
+import { initialState, State, useSharedState } from "../shared/State";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import LoginModal from "./LoginModal";
@@ -93,7 +93,7 @@ function Navigation(): JSX.Element {
 
 	const navbarCollapse: JSX.Element = (
 		<Navbar.Collapse>
-			<Nav className="navbar-nav mr-auto">
+			<Nav className="navbar-nav me-auto">
 				<LinkContainer to="/">
 					<Nav.Link>Home</Nav.Link>
 				</LinkContainer>

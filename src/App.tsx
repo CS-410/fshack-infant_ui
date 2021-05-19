@@ -1,36 +1,32 @@
-import React from "react";
-import { SharedStateProvider } from "./State";
+import { SharedStateProvider } from "./shared/State";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
+import FeedPage from "./components/FeedPage";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import Navigation from "./components/Navigation";
 import Results from "./components/Results";
 import About from "./components/About";
+import { feedPageParameter } from "./shared/Constants";
 
-class App extends React.Component {
-	render(): JSX.Element {
-		return (
-			<SharedStateProvider>
-				<Router>
-					<Navigation />
-					<Switch>
-						<Route path="/about">
-							<About />
-						</Route>
-						<Route path="/results">
-							<Results />
-						</Route>
-						<Route path="/">
-							<Home />
-						</Route>
-					</Switch>
-					{this.props.children}
-					<Footer />
-				</Router>
-			</SharedStateProvider>
-		);
-	}
+function App(): JSX.Element {
+	return (
+		<SharedStateProvider>
+			<Router>
+				<Navigation />
+				<Switch>
+					<Route path="/about" component={About} />
+					<Route
+						path={`/results/:${feedPageParameter}`}
+						component={FeedPage}
+					/>
+					<Route path="/results" component={Results} />
+					<Route path="/" component={Home} />
+				</Switch>
+				<Footer />
+			</Router>
+		</SharedStateProvider>
+	);
 }
 
 export default App;

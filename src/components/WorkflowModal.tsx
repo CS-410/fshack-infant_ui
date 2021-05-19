@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
-import { initialState, State, useSharedState } from "../State";
+import { initialState, State, useSharedState } from "../shared/State";
 import ClientSingleton from "../api/ClientSingleton";
 import { IPluginCreateData } from "@fnndsc/chrisapi";
 import { Button, Modal, ProgressBar, Spinner } from "react-bootstrap";
+import {
+	dircopyPluginName,
+	infantFSPluginName,
+	med2ImgPluginName,
+} from "../shared/Constants";
 
 interface ModalProps {
 	show: boolean;
@@ -35,7 +40,9 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		const uploadedFileName = state.uploadedFile.data.fname.split("/").pop();
 
 		// parent node: pl-dircopy
-		const dircopyLookup = await client.getPlugins({ name: "pl-dircopy" });
+		const dircopyLookup = await client.getPlugins({
+			name: dircopyPluginName,
+		});
 		const dircopyPlugin = await dircopyLookup.getItems()[0];
 		const dircopyArguments: IDirCreateData = {
 			title: "InfantFS analysis",
@@ -48,7 +55,9 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 		setStage(1);
 
 		// child node: pl-med2img
-		const med2imgLookup = await client.getPlugins({ name: "pl-med2img" });
+		const med2imgLookup = await client.getPlugins({
+			name: med2ImgPluginName,
+		});
 		const med2imgPlugin = await med2imgLookup.getItems()[0];
 		const med2imgArguments: IMedImgData = {
 			title: "Input image",
@@ -65,7 +74,7 @@ function WorkflowModal(props: ModalProps): JSX.Element {
 
 		// child node: pl-fshack-infant
 		const infantfsLookup = await client.getPlugins({
-			name: "pl-fshack-infant",
+			name: infantFSPluginName,
 		});
 		const infantfsPlugin = await infantfsLookup.getItems()[0];
 		const infantfsArguments: IFSHackData = {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { State, useSharedState } from "../State";
+import { State, useSharedState } from "../shared/State";
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import "../css/Navigation.css";
