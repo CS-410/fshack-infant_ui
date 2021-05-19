@@ -8,18 +8,23 @@ import {
 	PluginInstanceFileList,
 } from "@fnndsc/chrisapi";
 
+interface FileWithBlob {
+	fname: string;
+	blob: Blob;
+}
+
 function FeedPage(): JSX.Element {
 	let params = useParams<{ id: any }>();
 	const { id } = params;
 	const [fshackPlugin, setFshackPlugin] = useState<PluginInstance>(null);
-	const [fshackFiles, setFshackFiles] = useState<FeedFile[]>(null);
+	const [fshackFiles, setFshackFiles] = useState<FileWithBlob[]>(null);
 	const [med2ImgPlugin, setMed2ImgPlugin] = useState<PluginInstance>(null);
-	const [med2ImgFiles, setMed2ImgFiles] = useState<FeedFile[]>(null);
+	const [med2ImgFiles, setMed2ImgFiles] = useState<FileWithBlob[]>(null);
 
 	async function getPluginAndFiles(
 		pluginName: string,
 		pluginSetter: (value: React.SetStateAction<PluginInstance>) => void,
-		fileSetter: (value: React.SetStateAction<FeedFile[]>) => void
+		fileSetter: (value: React.SetStateAction<FileWithBlob[]>) => void
 	): Promise<void> {
 		const client = await ClientSingleton.getInstance();
 		const pluginInstance = await client.getPluginInstances({
@@ -31,25 +36,33 @@ function FeedPage(): JSX.Element {
 		const plugin: PluginInstance = pluginInstance.getItems()[0];
 		pluginSetter(plugin);
 
-		const pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
-			{
-				limit: 25,
-				offset: 0,
-			}
+		const fileParams = { limit: 200, offset: 0 };
+		let pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
+			fileParams
 		);
-		const files: FeedFile[] = pluginInstanceFiles.getItems();
-		fileSetter(files);
-
-		console.log("files", files);
-		for (let file of files) {
-			// console.log("file.data", file.data);
-
-			const blob = await file.getFileBlob();
-			console.log("file.getFileBlob()", blob);
-
-			const url = window.URL.createObjectURL(blob);
-			console.log("url", url);
+		let files: FeedFile[] = pluginInstanceFiles
+			.getItems()
+			.filter(
+				(file) =>
+					file.data.fname.endsWith("stats") ||
+					file.data.fname.endsWith("png")
+			);
+		while (pluginInstanceFiles.hasNextPage) {
+			try {
+				fileParams.offset += fileParams.limit;
+				pluginInstanceFiles = await plugin.getFiles(fileParams);
+				files = files.concat(pluginInstanceFiles.getItems());
+			} catch (e) {
+				throw new Error("Error while paginating files");
+			}
 		}
+		let filesWithBlobs: FileWithBlob[] = [];
+		for (let file of files) {
+			const blob: Blob = await file.getFileBlob();
+			filesWithBlobs.push({ fname: file.data.fname, blob: blob });
+		}
+		fileSetter(filesWithBlobs);
+		console.log("files", files);
 	}
 
 	useEffect(() => {
@@ -110,7 +123,7 @@ function FeedPage(): JSX.Element {
 		}
 	}
 
-	function getFilesContents(files: FeedFile[]): JSX.Element {
+	function getFilesContents(files: FileWithBlob[]): JSX.Element {
 		if (files) {
 			return (
 				<Table responsive>
@@ -123,24 +136,32 @@ function FeedPage(): JSX.Element {
 					</thead>
 					<tbody>
 						<tr>
-							{files.map((file) => {
-								const filename: string = file.data.fname
-									.split("/")
-									.pop()
-									.split(".")
-									.pop();
+							{files.map((file, index) => {
+								const { fname, blob } = file;
+								var urlCreator = window.URL || window.webkitURL;
 
-								if (filename.toLowerCase() === "png") {
+								if (fname.endsWith("png")) {
+									var imageUrl = urlCreator.createObjectURL(
+										blob
+									);
+
 									return (
 										<td>
 											<b style={{ color: "red" }}>
 												{`PNG: `}
 											</b>
-											{file.data.fname}
+											{fname}
+											<img src={imageUrl} />
 										</td>
 									);
 								}
-								return <td>{file.data.fname}</td>;
+								if (fname.endsWith("stats")) {
+									var statsUrl = urlCreator.createObjectURL(
+										blob
+									);
+									return <td>{fname}</td>;
+								}
+								return <td>{fname}</td>;
 							})}
 						</tr>
 					</tbody>
