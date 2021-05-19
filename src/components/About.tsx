@@ -18,7 +18,7 @@ function About(): JSX.Element {
 						brains, such as volume, thickness, surface area, and
 						curvature. Developers can also choose to generate their
 						own workflow through a shell script that would run on a
-						local instance of ChRIS' CUBE.
+						local instance of ChRIS' back-end (CUBE).
 					</p>
 					<h2>Usage</h2>
 					<p>
