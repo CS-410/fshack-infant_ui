@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Container, Table } from "react-bootstrap";
+import {
+	Container,
+	Table,
+	ListGroup,
+	Tab,
+	TabContainer,
+	ListGroupItem,
+	Row,
+	Col,
+} from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton from "../api/ClientSingleton";
 import {
@@ -9,9 +18,9 @@ import {
 } from "@fnndsc/chrisapi";
 
 interface FileWithBlob {
-	content?: any;
 	fname: string;
-	blob?: Blob;
+	blob: Blob;
+	content?: string;
 }
 
 function FeedPage(): JSX.Element {
@@ -21,6 +30,9 @@ function FeedPage(): JSX.Element {
 	const [fshackFiles, setFshackFiles] = useState<FileWithBlob[]>(null);
 	const [med2ImgPlugin, setMed2ImgPlugin] = useState<PluginInstance>(null);
 	const [med2ImgFiles, setMed2ImgFiles] = useState<FileWithBlob[]>(null);
+
+	const fshackName = "pl-fshack-infant";
+	const med2ImgName = "pl-med2img";
 
 	async function getPluginAndFiles(
 		pluginName: string,
@@ -57,7 +69,7 @@ function FeedPage(): JSX.Element {
 				file.data.fname.endsWith("png")
 		);
 
-		let filesWithBlobs: FileWithBlob[] = [];
+		const filesWithBlobs: FileWithBlob[] = [];
 		for (let file of files) {
 			const fname = file.data.fname;
 			const blob: Blob = await file.getFileBlob();
@@ -70,12 +82,11 @@ function FeedPage(): JSX.Element {
 			filesWithBlobs.push(fileWithBlob);
 		}
 		fileSetter(filesWithBlobs);
-		console.log("files", files);
 	}
 
 	useEffect(() => {
-		getPluginAndFiles("pl-fshack-infant", setFshackPlugin, setFshackFiles);
-		getPluginAndFiles("pl-med2img", setMed2ImgPlugin, setMed2ImgFiles);
+		getPluginAndFiles(fshackName, setFshackPlugin, setFshackFiles);
+		getPluginAndFiles(med2ImgName, setMed2ImgPlugin, setMed2ImgFiles);
 	}, []);
 
 	function getPluginContent(plugin: PluginInstance): JSX.Element {
@@ -108,8 +119,8 @@ function FeedPage(): JSX.Element {
 				<Table responsive>
 					<thead>
 						<tr>
-							{keys.map((key) => (
-								<th>
+							{keys.map((key, index) => (
+								<th key={index}>
 									{
 										keyToTextMap[
 											key as keyof typeof keyToTextMap
@@ -121,8 +132,10 @@ function FeedPage(): JSX.Element {
 					</thead>
 					<tbody>
 						<tr>
-							{keys.map((key) => (
-								<td>{plugin.data[key as keyof typeof data]}</td>
+							{keys.map((key, index) => (
+								<td key={index}>
+									{plugin.data[key as keyof typeof data]}
+								</td>
 							))}
 						</tr>
 					</tbody>
@@ -131,53 +144,76 @@ function FeedPage(): JSX.Element {
 		}
 	}
 
-	function getFilesContents(files: FileWithBlob[]): JSX.Element {
+	function getFilesContents(
+		files: FileWithBlob[],
+		pluginName: string
+	): JSX.Element {
 		if (files) {
-			return (
-				<Table responsive>
-					<thead>
-						<tr>
-							{files.map((_, index) => (
-								<th>{`File ${index}`}</th>
-							))}
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							{files.map((file) => {
-								const { fname, blob, content } = file;
+			const prefix = files[0].fname.endsWith("stats")
+				? fshackName
+				: files[0].fname.endsWith("png")
+				? med2ImgName
+				: "link";
 
-								if (fname.endsWith("png")) {
-									return (
-										<td>
-											<p>
-												<b style={{ color: "red" }}>
-													{`PNG: `}
-												</b>
-												{fname}
-											</p>
-											<img src={content} />
-										</td>
-									);
-								}
-								if (fname.endsWith("stats")) {
-									return (
-										<td>
-											<p>
-												<b style={{ color: "red" }}>
-													{`STATS: `}
-												</b>
-												{fname}
-											</p>
-											<p>{content}</p>
-										</td>
-									);
-								}
-								return <td>{fname}</td>;
-							})}
-						</tr>
-					</tbody>
-				</Table>
+			const listGroup = (
+				<ListGroup horizontal defaultActiveKey={`#${prefix}0`}>
+					{files.map((_, index) => (
+						<ListGroup.Item action href={`#${prefix}${index}`}>
+							File {index}
+						</ListGroup.Item>
+					))}
+				</ListGroup>
+			);
+
+			const tabContent = (
+				<Tab.Content>
+					{files.map((file, index) => {
+						const { fname, content } = file;
+						let tabContent = <p>{fname}</p>;
+
+						if (fname.endsWith("png")) {
+							tabContent = (
+								<>
+									<p>
+										<b style={{ color: "red" }}>
+											{`PNG: `}
+										</b>
+										{fname}
+									</p>
+									<img src={content} />
+								</>
+							);
+						}
+
+						if (fname.endsWith("stats")) {
+							tabContent = (
+								<>
+									<p>
+										<b style={{ color: "red" }}>
+											{`STATS: `}
+										</b>
+										{fname}
+									</p>
+									<p>{content}</p>
+								</>
+							);
+						}
+						return (
+							<Tab.Pane eventKey={`#${prefix}${index}`}>
+								{tabContent}
+							</Tab.Pane>
+						);
+					})}
+				</Tab.Content>
+			);
+
+			return (
+				<Tab.Container id={`list-group-tabs-${pluginName}`}>
+					<Row>
+						<Col>{listGroup} </Col>
+						<Col>{tabContent}</Col>
+					</Row>
+				</Tab.Container>
 			);
 		}
 	}
@@ -187,11 +223,13 @@ function FeedPage(): JSX.Element {
 			<h3>Feed Page</h3>
 			<h4>Infant FS plugin results</h4>
 			{getPluginContent(fshackPlugin)}
-			{getFilesContents(fshackFiles)}
+			{getFilesContents(fshackFiles, fshackName)}
 
 			<h4>Medical image plugin results</h4>
 			{getPluginContent(med2ImgPlugin)}
-			{getFilesContents(med2ImgFiles)}
+
+			{/* I can get rid of this once we have pl-multipass set up */}
+			{getFilesContents(med2ImgFiles, med2ImgName)}
 		</Container>
 	);
 }
