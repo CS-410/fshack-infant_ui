@@ -9,9 +9,9 @@ import {
 } from "@fnndsc/chrisapi";
 
 interface FileWithBlob {
+	content?: any;
 	fname: string;
 	blob?: Blob;
-	text?: string;
 }
 
 function FeedPage(): JSX.Element {
@@ -61,11 +61,11 @@ function FeedPage(): JSX.Element {
 		for (let file of files) {
 			const fname = file.data.fname;
 			const blob: Blob = await file.getFileBlob();
-			const fileWithBlob: FileWithBlob = { fname: fname };
+			const fileWithBlob: FileWithBlob = { fname: fname, blob: blob };
 			if (fname.endsWith("stats")) {
-				fileWithBlob.text = await blob.text();
+				fileWithBlob.content = await blob.text();
 			} else {
-				fileWithBlob.blob = blob;
+				fileWithBlob.content = window.URL.createObjectURL(blob);
 			}
 			filesWithBlobs.push(fileWithBlob);
 		}
@@ -145,14 +145,9 @@ function FeedPage(): JSX.Element {
 					<tbody>
 						<tr>
 							{files.map((file) => {
-								const { fname, blob, text } = file;
-								var urlCreator = window.URL || window.webkitURL;
+								const { fname, blob, content } = file;
 
 								if (fname.endsWith("png")) {
-									var imageUrl = urlCreator.createObjectURL(
-										blob
-									);
-
 									return (
 										<td>
 											<p>
@@ -161,7 +156,7 @@ function FeedPage(): JSX.Element {
 												</b>
 												{fname}
 											</p>
-											<img src={imageUrl} />
+											<img src={content} />
 										</td>
 									);
 								}
@@ -174,7 +169,7 @@ function FeedPage(): JSX.Element {
 												</b>
 												{fname}
 											</p>
-											<p>{text}</p>
+											<p>{content}</p>
 										</td>
 									);
 								}
