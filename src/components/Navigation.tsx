@@ -98,6 +98,9 @@ function Navigation(): JSX.Element {
 					<Nav.Link>Home</Nav.Link>
 				</LinkContainer>
 				<LinkContainer to="/results">{resultsButton()}</LinkContainer>
+				<LinkContainer to="/about">
+					<Nav.Link>About</Nav.Link>
+				</LinkContainer>
 			</Nav>
 			{loginStatus()}
 		</Navbar.Collapse>
