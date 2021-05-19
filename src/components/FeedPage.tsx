@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton from "../api/ClientSingleton";
 import {
@@ -12,18 +12,25 @@ import {
 function FeedPage(): JSX.Element {
 	let params = useParams<{ id: any }>();
 	const { id } = params;
-	const [plugin, setPlugin] = useState<PluginInstance>(null);
-	const [files, setFiles] = useState<any[]>(null);
+	const [fshackPlugin, setFshackPlugin] = useState<PluginInstance>(null);
+	const [fshackFiles, setFshackFiles] = useState<any[]>(null);
+	const [med2ImgPlugin, setMed2ImgPlugin] = useState<PluginInstance>(null);
+	const [med2ImgFiles, setMed2ImgFiles] = useState<any[]>(null);
 
-	async function getPluginAndFiles(): Promise<void> {
+	async function getPluginAndFiles(
+		pluginName: string,
+		pluginSetter: (value: React.SetStateAction<PluginInstance>) => void,
+		fileSetter: (value: React.SetStateAction<any[]>) => void
+	): Promise<void> {
 		const client = await ClientSingleton.getInstance();
 		const pluginInstance = await client.getPluginInstances({
 			limit: 25,
 			offset: 0,
-			plugin_name: "pl-fshack-infant",
+			plugin_name: pluginName,
+			feed_id: id,
 		});
 		const plugin: PluginInstance = pluginInstance.getItems()[0];
-		setPlugin(plugin);
+		pluginSetter(plugin);
 
 		const pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
 			{
@@ -32,86 +39,100 @@ function FeedPage(): JSX.Element {
 			}
 		);
 		const files = pluginInstanceFiles.getItems();
-		setFiles(files);
+		fileSetter(files);
 	}
 
 	useEffect(() => {
-		getPluginAndFiles();
+		getPluginAndFiles("pl-fshack-infant", setFshackPlugin, setFshackFiles);
+		getPluginAndFiles("pl-med2img", setMed2ImgPlugin, setMed2ImgFiles);
 	}, []);
 
-	function getPluginContent(): JSX.Element {
-		if (plugin && plugin.data) {
-			const {
-				id,
-				title,
-				previous_id,
-				plugin_id,
-				plugin_name,
-				plugin_version,
-				pipeline_inst,
-				feed_id,
-				start_date,
-				end_date,
-				status,
-				owner_username,
-				compute_resource_identifier,
-				cpu_limit,
-				memory_limit,
-				number_of_workers,
-				gpu_limit,
-			} = plugin.data;
-			const elements: JSX.Element[] = [];
+	function getPluginContent(plugin: PluginInstance): JSX.Element {
+		const { data } = plugin;
+		const keyToTextMap = {
+			id: "ID",
+			title: "Title",
+			previous_id: "Previous ID",
+			plugin_id: "Plugin ID",
+			plugin_name: "Plugin name",
+			plugin_version: "Plugin version",
+			pipeline_inst: "Pipeline instance",
+			feed_id: "Feed ID",
+			start_date: "Start date",
+			end_date: "End date",
+			status: "Status",
+			owner_username: "Owner username",
+			compute_resource_identifier: "Compute resource identifier",
+			cpu_limit: "CPU limit",
+			memory_limit: "Memory limit",
+			number_of_workers: "Number of workers",
+			gpu_limit: "GPU limit",
+		};
+
+		if (plugin && data) {
+			const keys = Object.keys(keyToTextMap);
 
 			return (
-				<>
-					<p>ID: {id}</p>
-					<p>Title: {title}</p>
-					<p>Previous ID: {previous_id}</p>
-					<p>Plugin ID: {plugin_id}</p>
-					<p>Plugin name: {plugin_name}</p>
-					<p>Plugin version: {plugin_version}</p>
-					<p>Pipeline instance: {pipeline_inst}</p>
-					<p>Feed ID: {feed_id}</p>
-					<p>Start date: {start_date}</p>
-					<p>End date: {end_date}</p>
-					<p>Status: {status}</p>
-					<p>Owner username: {owner_username}</p>
-					<p>
-						Compute resource identifier:{" "}
-						{compute_resource_identifier}
-					</p>
-					<p>CPU limit: {cpu_limit}</p>
-					<p>Memory limit: {memory_limit}</p>
-					<p>Number of workers: {number_of_workers}</p>
-					<p>GPU limit: {gpu_limit}</p>
-				</>
+				<Table responsive>
+					<thead>
+						<tr>
+							{keys.map((key) => (
+								<th>
+									{
+										keyToTextMap[
+											key as keyof typeof keyToTextMap
+										]
+									}
+								</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							{keys.map((key) => (
+								<td>{plugin.data[key as keyof typeof data]}</td>
+							))}
+						</tr>
+					</tbody>
+				</Table>
 			);
 		}
-
-		return <></>;
 	}
 
-	function getFilesContents(): JSX.Element {
+	function getFilesContents(files: any[]): JSX.Element {
 		if (files) {
 			console.log(files);
 			return (
-				<>
-					{files.map((file) => (
-						<p>{file.data.fname}</p>
-					))}
-				</>
+				<Table responsive>
+					<thead>
+						<tr>
+							{files.map((_, index) => (
+								<th>{`File ${index}`}</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							{files.map((file) => (
+								<td>{file.data.fname}</td>
+							))}
+						</tr>
+					</tbody>
+				</Table>
 			);
 		}
-		return <></>;
 	}
 
 	return (
 		<Container className="py-4">
 			<h3>Feed Page</h3>
-			<h4>Plugin content</h4>
-			{getPluginContent()}
-			<h4>Plugin files</h4>
-			{getFilesContents()}
+			<h4>Infant FS plugin results</h4>
+			{getPluginContent(fshackPlugin)}
+			{getFilesContents(fshackFiles)}
+
+			<h4>Medical image plugin results</h4>
+			{getPluginContent(med2ImgPlugin)}
+			{getFilesContents(med2ImgFiles)}
 		</Container>
 	);
 }
