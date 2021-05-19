@@ -10,7 +10,8 @@ import {
 
 interface FileWithBlob {
 	fname: string;
-	blob: Blob;
+	blob?: Blob;
+	text?: string;
 }
 
 function FeedPage(): JSX.Element {
@@ -58,8 +59,15 @@ function FeedPage(): JSX.Element {
 
 		let filesWithBlobs: FileWithBlob[] = [];
 		for (let file of files) {
+			const fname = file.data.fname;
 			const blob: Blob = await file.getFileBlob();
-			filesWithBlobs.push({ fname: file.data.fname, blob: blob });
+			const fileWithBlob: FileWithBlob = { fname: fname };
+			if (fname.endsWith("stats")) {
+				fileWithBlob.text = await blob.text();
+			} else {
+				fileWithBlob.blob = blob;
+			}
+			filesWithBlobs.push(fileWithBlob);
 		}
 		fileSetter(filesWithBlobs);
 		console.log("files", files);
@@ -136,8 +144,8 @@ function FeedPage(): JSX.Element {
 					</thead>
 					<tbody>
 						<tr>
-							{files.map((file, index) => {
-								const { fname, blob } = file;
+							{files.map((file) => {
+								const { fname, blob, text } = file;
 								var urlCreator = window.URL || window.webkitURL;
 
 								if (fname.endsWith("png")) {
@@ -158,9 +166,6 @@ function FeedPage(): JSX.Element {
 									);
 								}
 								if (fname.endsWith("stats")) {
-									var statsUrl = urlCreator.createObjectURL(
-										blob
-									);
 									return (
 										<td>
 											<p>
@@ -169,7 +174,7 @@ function FeedPage(): JSX.Element {
 												</b>
 												{fname}
 											</p>
-											<p></p>
+											<p>{text}</p>
 										</td>
 									);
 								}
