@@ -156,7 +156,7 @@ function FeedPage(): JSX.Element {
 				: "link";
 
 			const listGroup = (
-				<ListGroup horizontal defaultActiveKey={`#${prefix}0`}>
+				<ListGroup defaultActiveKey={`#${prefix}0`}>
 					{files.map((_, index) => (
 						<ListGroup.Item action href={`#${prefix}${index}`}>
 							File {index}
@@ -169,10 +169,10 @@ function FeedPage(): JSX.Element {
 				<Tab.Content>
 					{files.map((file, index) => {
 						const { fname, content } = file;
-						let tabContent = <p>{fname}</p>;
+						let paneContent = <p>{fname}</p>;
 
 						if (fname.endsWith("png")) {
-							tabContent = (
+							paneContent = (
 								<>
 									<p>
 										<b style={{ color: "red" }}>
@@ -186,7 +186,58 @@ function FeedPage(): JSX.Element {
 						}
 
 						if (fname.endsWith("stats")) {
-							tabContent = (
+							// the other stats files that don't share this whitespace-separated structure are console logged below
+							const statsWithTableStructure = [
+								"aseg.stats",
+								"lh.aparc.a2009s.stats",
+								"lh.aparc.DKTatlas.stats",
+								"lh.aparc.pial.stats",
+								"lh.aparc.stats",
+								"lh.BA_exvivo.stats",
+								"lh.BA_exvivo.thresh.stats",
+								"lh.w-g.pct.stats",
+								"rh.aparc.a2009s.stats",
+								"rh.aparc.DKTatlas.stats",
+								"rh.aparc.pial.stats",
+								"rh.aparc.stats",
+								"rh.BA_exvivo.stats",
+								"rh.BA_exvivo.thresh.stats",
+								"rh.w-g.pct.stats",
+								"wmparc.stats",
+							];
+							let header: string[] = [];
+							let body: string[][] = [];
+
+							if (
+								statsWithTableStructure.some((statsFilename) =>
+									fname.includes(statsFilename)
+								)
+							) {
+								const comments = content
+									.split("\n")
+									.filter((line) => line.includes("#"));
+
+								header = comments[comments.length - 1]
+									.split("ColHeaders")[1]
+									.split(/\s+/)
+									.filter((col) => col.length !== 0);
+
+								const nonComments = content
+									.split("\n")
+									.filter((line) => !line.includes("#"));
+
+								body = nonComments.map((line) =>
+									line
+										.split(/\s+/)
+										.filter((col) => col.length !== 0)
+								);
+							} else if (false) {
+								// left this here as a placeholder for the outlier stats files
+							} else {
+								console.log(fname, content);
+							}
+
+							paneContent = (
 								<>
 									<p>
 										<b style={{ color: "red" }}>
@@ -194,13 +245,30 @@ function FeedPage(): JSX.Element {
 										</b>
 										{fname}
 									</p>
-									<p>{content}</p>
+									<Table responsive size="sm">
+										<thead>
+											<tr>
+												{header.map((col) => (
+													<th>{col}</th>
+												))}
+											</tr>
+										</thead>
+										<tbody>
+											{body.map((row) => (
+												<tr>
+													{row.map((col) => (
+														<td>{col}</td>
+													))}
+												</tr>
+											))}
+										</tbody>
+									</Table>
 								</>
 							);
 						}
 						return (
 							<Tab.Pane eventKey={`#${prefix}${index}`}>
-								{tabContent}
+								{paneContent}
 							</Tab.Pane>
 						);
 					})}
@@ -210,8 +278,8 @@ function FeedPage(): JSX.Element {
 			return (
 				<Tab.Container id={`list-group-tabs-${pluginName}`}>
 					<Row>
-						<Col>{listGroup} </Col>
-						<Col>{tabContent}</Col>
+						<Col md={2}>{listGroup} </Col>
+						<Col md={10}>{tabContent}</Col>
 					</Row>
 				</Tab.Container>
 			);
