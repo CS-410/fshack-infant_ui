@@ -48,7 +48,6 @@ function FeedPage(): JSX.Element {
 	}, []);
 
 	function getPluginContent(plugin: PluginInstance): JSX.Element {
-		const { data } = plugin;
 		const keyToTextMap = {
 			id: "ID",
 			title: "Title",
@@ -69,7 +68,9 @@ function FeedPage(): JSX.Element {
 			gpu_limit: "GPU limit",
 		};
 
-		if (plugin && data) {
+		if (plugin && plugin.data) {
+			const { data } = plugin;
+
 			const keys = Object.keys(keyToTextMap);
 
 			return (
@@ -102,6 +103,7 @@ function FeedPage(): JSX.Element {
 	function getFilesContents(files: any[]): JSX.Element {
 		if (files) {
 			console.log(files);
+
 			return (
 				<Table responsive>
 					<thead>
@@ -113,9 +115,24 @@ function FeedPage(): JSX.Element {
 					</thead>
 					<tbody>
 						<tr>
-							{files.map((file) => (
-								<td>{file.data.fname}</td>
-							))}
+							{files.map((file) => {
+								const filename: string = file.data.fname
+									.split("/")
+									.pop()
+									.split(".")
+									.pop();
+								if (filename.toLowerCase() === "png") {
+									return (
+										<td>
+											<b style={{ color: "red" }}>
+												{`PNG: `}
+											</b>
+											{file.data.fname}
+										</td>
+									);
+								}
+								return <td>{file.data.fname}</td>;
+							})}
 						</tr>
 					</tbody>
 				</Table>
