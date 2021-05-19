@@ -19,7 +19,7 @@ function Navigation(): JSX.Element {
 			};
 		});
 		window.localStorage.clear();
-	};
+	}
 
 	useEffect(() => {
 		setState((previous: State) => {
@@ -45,12 +45,13 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={showLoginModal}><b>Login</b></Nav.Link>
+					<Nav.Link onClick={showLoginModal}>
+						<b>Login</b>
+					</Nav.Link>
 				</Nav>
 			);
 		}
 	}
-
 
 	function showLoginModal(): void {
 		setState((previous: State) => {
@@ -59,7 +60,7 @@ function Navigation(): JSX.Element {
 				showLogin: true,
 			};
 		});
-	};
+	}
 
 	function hideLoginModal(): void {
 		setState((previous: State) => {
@@ -92,6 +93,9 @@ function Navigation(): JSX.Element {
 				</LinkContainer>
 				<LinkContainer to="/results">
 					<Nav.Link>Results</Nav.Link>
+				</LinkContainer>
+				<LinkContainer to="/about">
+					<Nav.Link>About</Nav.Link>
 				</LinkContainer>
 			</Nav>
 			{loginStatus()}
