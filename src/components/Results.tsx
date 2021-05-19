@@ -199,7 +199,7 @@ function getTableEntry(feed: Feed, index: number): JSX.Element {
 			<td>{modificationDate.fromNow()}</td>
 			<td>{status}</td>
 			<td>
-				<LinkContainer to={"/feeds/" + id}>
+				<LinkContainer to={"/results/" + id}>
 					<Button variant="outline-primary">View</Button>
 				</LinkContainer>
 			</td>

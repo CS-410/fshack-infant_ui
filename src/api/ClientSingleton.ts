@@ -18,6 +18,10 @@ class ClientSingleton {
 		}
 		return ClientSingleton.client;
 	}
+
+	public static getToken(): string {
+		return ClientSingleton.token;
+	}
 }
 
 export default ClientSingleton;

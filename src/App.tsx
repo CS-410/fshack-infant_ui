@@ -15,9 +15,9 @@ class App extends React.Component {
 				<Router>
 					<Navigation />
 					<Switch>
+						<Route path="/results/:id" component={FeedPage} />
 						<Route path="/results" component={Results} />
 						<Route path="/" component={Home} />
-						<Route path="/feeds/:id" component={FeedPage} />
 					</Switch>
 					{this.props.children}
 					<Footer />
