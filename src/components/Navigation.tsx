@@ -1,33 +1,22 @@
 import { useEffect } from "react";
-import { initialState, State, useSharedState } from "../shared/State";
+import { initialState, State, useSharedState } from "../state";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import LoginModal from "./LoginModal";
 import chrisLogo from "../assets/chrisLogo.png";
 import "../css/Navigation.css";
 
-function Navigation(): JSX.Element {
+export default function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
 
-	function handleLogout(): void {
-		setState((previous: State) => {
-			return {
-				...previous,
-				username: initialState.username,
-			};
-		});
-		window.localStorage.clear();
-	}
-
 	useEffect(() => {
-		setState((previous: State) => {
-			const storedUsername = window.localStorage.getItem("username");
+		setState((prev: State) => {
 			return {
-				...previous,
-				username: storedUsername,
+				...prev,
+				username: window.localStorage.getItem("username"),
 			};
 		});
-	}, [state.username, setState]);
+	}, [state.username]);
 
 	function loginStatus(): JSX.Element {
 		if (state.username) {
@@ -43,7 +32,7 @@ function Navigation(): JSX.Element {
 		} else {
 			return (
 				<Nav>
-					<Nav.Link onClick={showLoginModal}>
+					<Nav.Link onClick={() => toggleLoginModal(true)}>
 						<b>Login</b>
 					</Nav.Link>
 				</Nav>
@@ -51,73 +40,53 @@ function Navigation(): JSX.Element {
 		}
 	}
 
-	function showLoginModal(): void {
-		setState((previous: State) => {
+	function handleLogout(): void {
+		setState((prev: State) => {
 			return {
-				...previous,
-				showLogin: true,
+				...prev,
+				username: initialState.username,
+			};
+		});
+		window.localStorage.clear();
+	}
+
+	function toggleLoginModal(boolean: boolean): void {
+		setState((prev: State) => {
+			return {
+				...prev,
+				showLogin: boolean,
 			};
 		});
 	}
-
-	function hideLoginModal(): void {
-		setState((previous: State) => {
-			return {
-				...previous,
-				showLogin: false,
-			};
-		});
-	}
-
-	const navbarBrand: JSX.Element = (
-		<Navbar.Brand>
-			<Image
-				src={chrisLogo}
-				style={{
-					filter: "brightness(1) invert(1)",
-				}}
-				className="d-inline-block"
-				height="50"
-			/>
-			{` InfantFS UI`}
-		</Navbar.Brand>
-	);
-
-	function resultsButton(): JSX.Element {
-		if (state.username) {
-			return <Nav.Link>Results</Nav.Link>;
-		} else {
-			return <Nav.Link disabled>Results</Nav.Link>;
-		}
-	}
-
-	const navbarCollapse: JSX.Element = (
-		<Navbar.Collapse>
-			<Nav className="navbar-nav me-auto">
-				<LinkContainer to="/">
-					<Nav.Link>Home</Nav.Link>
-				</LinkContainer>
-				<LinkContainer to="/results">{resultsButton()}</LinkContainer>
-				<LinkContainer to="/about">
-					<Nav.Link>About</Nav.Link>
-				</LinkContainer>
-			</Nav>
-			{loginStatus()}
-		</Navbar.Collapse>
-	);
 
 	return (
 		<>
-			<Navbar bg="light" expand="md" className="py-3">
+			<Navbar className="py-3" bg="light" expand="md">
 				<Container>
-					{navbarBrand}
+					<Navbar.Brand>
+						<Image id="logo" src={chrisLogo} />
+						{` InfantFS UI`}
+					</Navbar.Brand>
 					<Navbar.Toggle />
-					{navbarCollapse}
+					<Navbar.Collapse>
+						<Nav className="navbar-nav me-auto">
+							<LinkContainer to="/">
+								<Nav.Link>Home</Nav.Link>
+							</LinkContainer>
+							<LinkContainer to="/results">
+								<Nav.Link disabled={!state.username}>
+									Results
+								</Nav.Link>
+							</LinkContainer>
+						</Nav>
+						{loginStatus()}
+					</Navbar.Collapse>
 				</Container>
 			</Navbar>
-			<LoginModal show={state.showLogin} onHide={hideLoginModal} />
+			<LoginModal
+				show={state.showLogin}
+				onHide={() => toggleLoginModal(false)}
+			/>
 		</>
 	);
 }
-
-export default Navigation;
