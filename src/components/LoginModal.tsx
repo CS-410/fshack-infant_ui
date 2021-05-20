@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 import { State, useSharedState } from "../State";
+import { ModalProps } from "../api/interfaces";
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import "../css/Navigation.css";
 
-interface LoginProps {
-	show: boolean;
-	onHide(): void;
-}
-
-function LoginModal(props: LoginProps): JSX.Element {
+export default function LoginModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
 	const [invalidLogin, setInvalidLogin] = useState(false);
-
-	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
-	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 
 	async function onLogin(): Promise<void> {
 		try {
@@ -28,9 +21,9 @@ function LoginModal(props: LoginProps): JSX.Element {
 			);
 			window.localStorage.setItem("username", username);
 			window.localStorage.setItem("authToken", authToken);
-			setState((previous: State) => {
+			setState((prev: State) => {
 				return {
-					...previous,
+					...prev,
 					username: username,
 				};
 			});
@@ -42,8 +35,9 @@ function LoginModal(props: LoginProps): JSX.Element {
 		}
 	}
 
-	const labelColSize = 3;
-	const fieldColSize = 9;
+	const labelColSize = 3, fieldColSize = 9;
+	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
+	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 
 	const usernameField: JSX.Element = (
 		<Form.Group as={Row}>
@@ -75,44 +69,31 @@ function LoginModal(props: LoginProps): JSX.Element {
 		</Form.Group>
 	);
 
-	const modalHeader: JSX.Element = (
-		<Modal.Header>
-			<Modal.Title>Log into ChRIS</Modal.Title>
-		</Modal.Header>
-	);
-
-	const modalBody: JSX.Element = (
-		<Modal.Body>
-			{invalidLogin && (
-				<Alert variant="danger">
-					Invalid login credentials! Please try again.
-				</Alert>
-			)}
-			<Form>
-				{usernameField}
-				{passwordField}
-			</Form>
-		</Modal.Body>
-	);
-
-	const modalFooter: JSX.Element = (
-		<Modal.Footer>
-			<Button variant="outline-danger" onClick={props.onHide}>
-				Close
-			</Button>
-			<Button variant="success" onClick={onLogin}>
-				Continue
-			</Button>
-		</Modal.Footer>
-	);
-
 	return (
 		<Modal show={props.show} onHide={props.onHide} centered>
-			{modalHeader}
-			{modalBody}
-			{modalFooter}
+			<Modal.Header>
+				<Modal.Title>Log into ChRIS</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				{invalidLogin && (
+					<Alert variant="danger">
+						Invalid login credentials! Please try again.
+					</Alert>
+				)}
+				<Form>
+					{usernameField}
+					<br />
+					{passwordField}
+				</Form>
+			</Modal.Body>
+			<Modal.Footer>
+				<Button variant="outline-danger" onClick={props.onHide}>
+					Close
+				</Button>
+				<Button variant="success" onClick={onLogin}>
+					Continue
+				</Button>
+			</Modal.Footer>
 		</Modal>
 	);
 }
-
-export default LoginModal;

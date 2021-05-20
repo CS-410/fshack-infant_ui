@@ -2,7 +2,7 @@ import { Col } from "react-bootstrap";
 
 function Overview(): JSX.Element {
 	return (
-		<Col md={7}>
+		<Col>
 			<h2>Background</h2>
 			<p>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

@@ -1,6 +1,6 @@
-import Client from "@fnndsc/chrisapi";
+import Client, { Feed } from "@fnndsc/chrisapi";
 
-class ClientSingleton {
+export default class ClientSingleton {
 	private static token: string = null;
 	private static client: Client = null;
 
@@ -20,4 +20,33 @@ class ClientSingleton {
 	}
 }
 
-export default ClientSingleton;
+export function feedStatus(feed: Feed): number {
+	const {
+		started_jobs,
+		waiting_jobs,
+		errored_jobs,
+		cancelled_jobs,
+	} = feed.data;
+
+	const hasStartedJobs = started_jobs !== 0;
+	const hasWaitingJobs = waiting_jobs !== 0;
+	const hasErroredJobs = errored_jobs !== 0;
+	const hasCancelledJobs = cancelled_jobs !== 0;
+
+	let status = -1;
+	if (
+		!hasStartedJobs &&
+		!hasWaitingJobs &&
+		!hasCancelledJobs &&
+		!hasErroredJobs
+	) {
+		status = 0;
+	} else if (hasStartedJobs || hasWaitingJobs) {
+		status = 1;
+	} else if (hasCancelledJobs) {
+		status = 2;
+	} else if (hasErroredJobs) {
+		status = 3;
+	}
+	return status;
+}
