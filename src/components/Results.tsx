@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 import ClientSingleton from "../api/ClientSingleton";
+import { LinkContainer } from "react-router-bootstrap";
 import {
 	Badge,
 	Button,
@@ -16,49 +17,23 @@ import "../css/Results.css";
 import { Feed } from "@fnndsc/chrisapi";
 
 function Results(): JSX.Element {
-	const [feeds, setFeeds] = useState([]);
-
-	async function getFeeds(): Promise<void> {
-		let feeds: Feed[] = [];
-
-		const client = await ClientSingleton.getInstance();
-		const infantfsInstances = await client.getPluginInstances({
-			plugin_name: "pl-fshack-infant",
-		});
-
-		for (let instance of infantfsInstances.getItems()) {
-			const feed = await instance.getFeed();
-			feeds.push(feed);
-		}
-
-		setFeeds(feeds);
-	}
+	const [feeds, setFeeds] = useState<Feed[]>([]);
 
 	useEffect(() => {
-		getFeeds();
+		getFeeds(setFeeds);
 	}, []);
 
 	const [currentPage, setCurrentPage] = useState(1);
 	const postsPerPage = 5;
-	const indexOfLastPost = currentPage * postsPerPage;
-	const indexOfFirstPost = indexOfLastPost - postsPerPage;
-	const currentPosts = feeds.slice(indexOfFirstPost, indexOfLastPost);
 	const totalPosts = feeds.length;
-
-	const paginate = (pageNum: number) => setCurrentPage(pageNum);
-	const nextPage = () => setCurrentPage(currentPage + 1);
-	const prevPage = () => setCurrentPage(currentPage - 1);
 
 	const pagination = getPagination(
 		currentPage,
 		postsPerPage,
 		totalPosts,
-		paginate,
-		nextPage,
-		prevPage
+		setCurrentPage
 	);
-
-	const posts = currentPosts.map(getTableEntry);
+	const posts = getPosts(currentPage, postsPerPage, feeds);
 
 	return (
 		<Container className="py-4">
@@ -80,14 +55,34 @@ function Results(): JSX.Element {
 	);
 }
 
+async function getFeeds(
+	feedsSetter: (value: React.SetStateAction<Feed[]>) => void
+): Promise<void> {
+	let feeds: Feed[] = [];
+
+	const client = await ClientSingleton.getInstance();
+	const infantfsInstances = await client.getPluginInstances({
+		plugin_name: "pl-fshack-infant",
+	});
+
+	for (let instance of infantfsInstances.getItems()) {
+		const feed = await instance.getFeed();
+		feeds.push(feed);
+	}
+
+	feedsSetter(feeds);
+}
+
 function getPagination(
 	currentPage: number,
 	postsPerPage: number,
 	totalPosts: number,
-	paginate: (pageNum: number) => void,
-	nextPage: () => void,
-	prevPage: () => void
+	currentPageSetter: (value: React.SetStateAction<number>) => void
 ): JSX.Element {
+	const paginate = (pageNum: number) => currentPageSetter(pageNum);
+	const nextPage = () => currentPageSetter(currentPage + 1);
+	const prevPage = () => currentPageSetter(currentPage - 1);
+
 	let active = currentPage;
 	let items = [];
 	const lastPage = Math.ceil(totalPosts / postsPerPage);
@@ -103,6 +98,7 @@ function getPagination(
 			</Pagination.Item>
 		);
 	}
+
 	return (
 		<Pagination>
 			<Pagination.First onClick={() => paginate(1)} />
@@ -115,6 +111,18 @@ function getPagination(
 			<Pagination.Last onClick={() => paginate(lastPage)} />
 		</Pagination>
 	);
+}
+
+function getPosts(
+	currentPage: number,
+	postsPerPage: number,
+	feeds: Feed[]
+): JSX.Element[] {
+	const indexOfLastPost = currentPage * postsPerPage;
+	const indexOfFirstPost = indexOfLastPost - postsPerPage;
+	const currentPosts = feeds.slice(indexOfFirstPost, indexOfLastPost);
+	const posts = currentPosts.map(getTableEntry);
+	return posts;
 }
 
 function getStatusIndicator(icon: JSX.Element, text: string): JSX.Element {
@@ -198,9 +206,9 @@ function getTableEntry(feed: Feed, index: number): JSX.Element {
 			<td>{modificationDate.fromNow()}</td>
 			<td>{status}</td>
 			<td>
-				<Button href={"/results/" + id} variant="outline-primary">
-					View
-				</Button>
+				<LinkContainer to={"/results/" + id}>
+					<Button variant="outline-primary">View</Button>
+				</LinkContainer>
 			</td>
 		</tr>
 	);
