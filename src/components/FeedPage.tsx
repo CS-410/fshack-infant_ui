@@ -2,23 +2,20 @@ import { useState, useEffect } from "react";
 import { Container, Table, ListGroup, Tab, Row, Col } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton from "../api/ClientSingleton";
-import Client, {
-	FeedFile,
-	PluginInstance,
-	PluginInstanceFileList,
-} from "@fnndsc/chrisapi";
+import Client, { FeedFile, PluginInstance } from "@fnndsc/chrisapi";
 import {
 	infantFSPluginName,
 	med2ImgPluginName,
+	feedPageParameter,
 	statsWithTableStructure,
 	keyToTextMap,
 } from "../shared/Constants";
 
-interface FeedPageParams {
-	id: any;
+interface Parameters {
+	[key: string]: any;
 }
 
-interface FileWithBlob {
+interface File {
 	fname: string;
 	blob: Blob;
 	content?: string;
@@ -30,22 +27,22 @@ interface TableStructure {
 }
 
 function FeedPage(): JSX.Element {
-	let params = useParams<FeedPageParams>();
-	const { id } = params;
+	let params = useParams<Parameters>();
+	const feedId = params[feedPageParameter];
 	const [fshackPlugin, setFshackPlugin] = useState<PluginInstance>(null);
-	const [fshackFiles, setFshackFiles] = useState<FileWithBlob[]>(null);
+	const [fshackFiles, setFshackFiles] = useState<File[]>(null);
 	const [med2ImgPlugin, setMed2ImgPlugin] = useState<PluginInstance>(null);
-	const [med2ImgFiles, setMed2ImgFiles] = useState<FileWithBlob[]>(null);
+	const [med2ImgFiles, setMed2ImgFiles] = useState<File[]>(null);
 
 	useEffect(() => {
 		getPluginAndFiles(
-			id,
+			feedId,
 			infantFSPluginName,
 			setFshackPlugin,
 			setFshackFiles
 		);
 		getPluginAndFiles(
-			id,
+			feedId,
 			med2ImgPluginName,
 			setMed2ImgPlugin,
 			setMed2ImgFiles
@@ -72,15 +69,15 @@ async function getPluginAndFiles(
 	id: string,
 	pluginName: string,
 	pluginSetter: (value: React.SetStateAction<PluginInstance>) => void,
-	fileSetter: (value: React.SetStateAction<FileWithBlob[]>) => void
+	filesSetter: (value: React.SetStateAction<File[]>) => void
 ): Promise<void> {
 	const client = await ClientSingleton.getInstance();
 	const plugin: PluginInstance = await getPlugin(client, id, pluginName);
 	pluginSetter(plugin);
 
-	const files: FeedFile[] = await getFiles(plugin);
-	const filesWithBlobs: FileWithBlob[] = await getFilesWithBlobs(files);
-	fileSetter(filesWithBlobs);
+	const feedFiles: FeedFile[] = await getFeedFiles(plugin);
+	const files: File[] = await getFiles(feedFiles);
+	filesSetter(files);
 }
 
 async function getPlugin(
@@ -100,45 +97,46 @@ async function getPlugin(
 	return plugin;
 }
 
-async function getFiles(plugin: PluginInstance): Promise<FeedFile[]> {
+async function getFeedFiles(plugin: PluginInstance): Promise<FeedFile[]> {
 	const fileParams = { limit: 200, offset: 0 };
-	let pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
-		fileParams
-	);
-	let files: FeedFile[] = pluginInstanceFiles.getItems();
+	let pluginInstanceFiles = await plugin.getFiles(fileParams);
+	let feedFiles: FeedFile[] = pluginInstanceFiles.getItems();
 
 	while (pluginInstanceFiles.hasNextPage) {
 		try {
 			fileParams.offset += fileParams.limit;
 			pluginInstanceFiles = await plugin.getFiles(fileParams);
-			files = files.concat(pluginInstanceFiles.getItems());
+			feedFiles = feedFiles.concat(pluginInstanceFiles.getItems());
 		} catch (e) {
 			throw new Error("Error while paginating files");
 		}
 	}
 
-	files = files.filter((file: FeedFile) => {
-		const { fname } = file.data;
-		return fname.endsWith("stats") || fname.endsWith("png");
-	});
-
-	return files;
+	feedFiles = feedFiles.filter(isStatsOrPng);
+	return feedFiles;
 }
 
-async function getFilesWithBlobs(files: FeedFile[]): Promise<FileWithBlob[]> {
-	const filesWithBlobs: FileWithBlob[] = [];
-	for (let file of files) {
-		const fname = file.data.fname;
-		const blob: Blob = await file.getFileBlob();
-		const fileWithBlob: FileWithBlob = { fname: fname, blob: blob };
+function isStatsOrPng(file: FeedFile): boolean {
+	const { fname } = file.data;
+	return fname.endsWith("stats") || fname.endsWith("png");
+}
+
+async function getFiles(feedFiles: FeedFile[]): Promise<File[]> {
+	const files: File[] = [];
+
+	for (let feedFile of feedFiles) {
+		const fname = feedFile.data.fname;
+		const blob: Blob = await feedFile.getFileBlob();
+		const file: File = { fname: fname, blob: blob };
+
 		if (fname.endsWith("stats")) {
-			fileWithBlob.content = await blob.text();
+			file.content = await blob.text();
 		} else {
-			fileWithBlob.content = window.URL.createObjectURL(blob);
+			file.content = window.URL.createObjectURL(blob);
 		}
-		filesWithBlobs.push(fileWithBlob);
+		files.push(file);
 	}
-	return filesWithBlobs;
+	return files;
 }
 
 function getPluginContent(plugin: PluginInstance): JSX.Element {
@@ -147,7 +145,7 @@ function getPluginContent(plugin: PluginInstance): JSX.Element {
 		const keys = Object.keys(keyToTextMap);
 
 		return (
-			<Table responsive>
+			<Table responsive size="sm">
 				<thead>
 					<tr>
 						{keys.map((key, index) => (
@@ -171,10 +169,7 @@ function getPluginContent(plugin: PluginInstance): JSX.Element {
 	}
 }
 
-function getFilesContents(
-	files: FileWithBlob[],
-	pluginName: string
-): JSX.Element {
+function getFilesContents(files: File[], pluginName: string): JSX.Element {
 	if (files) {
 		const prefix = files[0].fname.endsWith("stats")
 			? infantFSPluginName
@@ -279,7 +274,7 @@ function getTableStructure(fname: string, content: string): TableStructure {
 
 function getListGroupItem(
 	prefix: string
-): (value: FileWithBlob, index: number, array: FileWithBlob[]) => JSX.Element {
+): (value: File, index: number, array: File[]) => JSX.Element {
 	return (_, index) => (
 		<ListGroup.Item action href={`#${prefix}${index}`}>
 			File {index}
@@ -291,7 +286,7 @@ function getTabPane(
 	handlePng: (fname: string, content: string) => JSX.Element,
 	handleStats: (fname: string, content: string) => JSX.Element,
 	prefix: string
-): (value: FileWithBlob, index: number, array: FileWithBlob[]) => JSX.Element {
+): (value: File, index: number, array: File[]) => JSX.Element {
 	return (file, index) => {
 		const { fname, content } = file;
 		let paneContent = <p>{fname}</p>;

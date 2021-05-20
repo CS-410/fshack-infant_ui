@@ -7,6 +7,7 @@ import Home from "./components/Home";
 import Navigation from "./components/Navigation";
 import Results from "./components/Results";
 import About from "./components/About";
+import { feedPageParameter } from "./shared/Constants";
 
 function App(): JSX.Element {
 	return (
@@ -15,7 +16,10 @@ function App(): JSX.Element {
 				<Navigation />
 				<Switch>
 					<Route path="/about" component={About} />
-					<Route path="/results/:id" component={FeedPage} />
+					<Route
+						path={`/results/:${feedPageParameter}`}
+						component={FeedPage}
+					/>
 					<Route path="/results" component={Results} />
 					<Route path="/" component={Home} />
 				</Switch>

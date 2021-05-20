@@ -98,6 +98,7 @@ function getPagination(
 			</Pagination.Item>
 		);
 	}
+
 	return (
 		<Pagination>
 			<Pagination.First onClick={() => paginate(1)} />
