@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { initialState, State, useSharedState } from "../State";
+import { initialState, State, useSharedState } from "../shared/State";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import LoginModal from "./LoginModal";
