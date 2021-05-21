@@ -9,10 +9,10 @@ import { Feed } from "@fnndsc/chrisapi";
 export default function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
 	const [stage, setStage] = useState<number>(0);
-	const [feedID, setFeedID] = useState<number>(55);
+	const [feedID, setFeedID] = useState<number>(null);
 
 	useEffect(() => {
-		if (state.showWorkflow) {
+		if (state.showWorkflow && state.uploadedFile) {
 			setState((prev: State) => {
 				return {
 					...prev,
@@ -24,7 +24,7 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 	}, [state.showWorkflow]);
 
 	async function runWorkflow(): Promise<void> {
-		/*const client = await ClientSingleton.getInstance();
+		const client = await ClientSingleton.getInstance();
 		const uploadedFileName = state.uploadedFile.data.fname.split("/").pop();
 
 		// parent node: pl-dircopy
@@ -78,7 +78,7 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 		const infantfsInstance = await client.createPluginInstance(
 			infantfsPlugin.data.id,
 			infantfsArguments
-		);*/
+		);
 		setStage(3);
 	}
 
