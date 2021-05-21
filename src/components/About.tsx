@@ -25,9 +25,8 @@ function About(): JSX.Element {
 						<ol>
 							<li>
 								Get the back-end of ChRIS running (further
-								instructions
+								instructions{" "}
 								<a href="http://chrisproject.org/join-us/get-chris-running">
-									{" "}
 									here
 								</a>
 								)
