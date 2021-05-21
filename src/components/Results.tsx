@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSharedState } from "../shared/state";
 import moment from "moment";
-import { AllPluginInstanceList, Feed, PluginInstance } from "@fnndsc/chrisapi";
+import Client, { Feed, PluginInstance } from "@fnndsc/chrisapi";
 import { overlayTooltip, feedStatusIndicator } from "./UI";
 import ClientSingleton from "../api/ClientSingleton";
 import { LinkContainer } from "react-router-bootstrap";
 import { Badge, Button, Container, Table, Pagination } from "react-bootstrap";
 import "../css/Results.css";
-import { SearchParams } from "../shared/interfaces";
 import { infantFSPluginName } from "../shared/constants";
 
 export default function Results(): JSX.Element {
@@ -16,33 +15,8 @@ export default function Results(): JSX.Element {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 
 	useEffect(() => {
-		(async function getFeeds(): Promise<void> {
-			let feeds: Feed[] = [];
-			let searchParams: SearchParams = {
-				plugin_name: infantFSPluginName,
-				offset: 0,
-				limit: 10,
-			};
-			const client = await ClientSingleton.getInstance();
-			let infantfsInstanceList: AllPluginInstanceList = await client.getPluginInstances(
-				searchParams
-			);
-			let infantfsInstances: PluginInstance[] = await infantfsInstanceList.getItems();
-			while (infantfsInstanceList.hasNextPage) {
-				searchParams.offset += searchParams.limit;
-				infantfsInstanceList = await client.getPluginInstances(
-					searchParams
-				);
-				infantfsInstances = infantfsInstances.concat(
-					infantfsInstanceList.getItems()
-				);
-			}
-			for (const instance of infantfsInstances) {
-				feeds.push(await instance.getFeed());
-			}
-			setFeeds(feeds);
-		})();
-	}, []);
+		getFeeds(setFeeds);
+	}, [feeds, setFeeds]);
 
 	const feedsPerPage: number = 10;
 	const lastPage: number = Math.ceil(feeds.length / feedsPerPage);
@@ -138,4 +112,47 @@ export default function Results(): JSX.Element {
 			<div className="d-flex justify-content-center">{pagination()}</div>
 		</Container>
 	);
+}
+
+async function getFeeds(
+	feedsSetter: (value: React.SetStateAction<Feed[]>) => void
+): Promise<void> {
+	const client = await ClientSingleton.getInstance();
+	const instanceParams = {
+		plugin_name: infantFSPluginName,
+		limit: 10,
+		offset: 0,
+	};
+
+	let instances: PluginInstance[] = await getPluginInstances(
+		client,
+		instanceParams
+	);
+	let feeds: Feed[] = [];
+
+	for (let instance of instances) {
+		const feed = await instance.getFeed();
+		feeds.push(feed);
+	}
+
+	feedsSetter(feeds);
+}
+
+async function getPluginInstances(
+	client: Client,
+	instanceParams: { plugin_name: string; limit: number; offset: number }
+): Promise<PluginInstance[]> {
+	let infantfsInstances = await client.getPluginInstances(instanceParams);
+	let instances: PluginInstance[] = infantfsInstances.getItems();
+
+	while (infantfsInstances.hasNextPage) {
+		try {
+			instanceParams.offset += instanceParams.limit;
+			infantfsInstances = await client.getPluginInstances(instanceParams);
+			instances = instances.concat(infantfsInstances.getItems());
+		} catch (error) {
+			throw new Error("Error while paginating feeds");
+		}
+	}
+	return instances;
 }

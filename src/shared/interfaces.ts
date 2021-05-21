@@ -1,4 +1,4 @@
-import { IPluginCreateData } from "@fnndsc/chrisapi";
+import { IPluginCreateData, Feed } from "@fnndsc/chrisapi";
 
 export interface ModalProps {
 	show: boolean;
@@ -39,3 +39,27 @@ export interface SearchParams {
 export interface Parameters {
 	[key: string]: string;
 }
+
+export type FeedViewState = {
+	ifsFiles: FileObj[];
+	medFiles: FileObj[];
+	uploadedFileName: string;
+	feed: Feed;
+	feedStatus: number;
+};
+
+export type FeedViewValue =
+	| FileObj[]
+	| string
+	| Feed
+	| number
+	| { feed: Feed; feedStatus: number };
+
+export type FeedViewDispatch = React.Dispatch<{
+	type: string;
+	value: FeedViewValue;
+}>;
+
+export type TableStructure = { head: TableHeader; body: TableBody };
+export type TableHeader = { [key: string]: string | undefined }[];
+export type TableBody = string[][];
