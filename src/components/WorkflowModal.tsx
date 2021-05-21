@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { initialState, State, useSharedState } from "../shared/state";
 import ClientSingleton from "../api/ClientSingleton";
-import { Modal, ModalProps, ProgressBar } from "react-bootstrap";
+import { Button, Modal, ModalProps, ProgressBar } from "react-bootstrap";
 import { IDirCreateData, IMedImgData, IFSHackData } from "../shared/interfaces";
 import {
 	dircopyPluginName,
@@ -12,6 +12,7 @@ import {
 export default function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
 	const [stage, setStage] = useState(0);
+	const [feedID, setFeedID] = useState<number>(null);
 
 	useEffect(() => {
 		if (state.showWorkflow && state.uploadedFile) {
@@ -42,6 +43,8 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 			dircopyPlugin.data.id,
 			dircopyArguments
 		);
+		const feed = await dircopyInstance.getFeed();
+		setFeedID(feed.data.id);
 		setStage(1);
 
 		// child node: pl-med2img
@@ -81,9 +84,20 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 		);
 		setStage(3);
 	}
+	function title(): any {
+		if (stage === 3 && feedID) {
+			return (
+				<>
+					Feed <b>{feedID}</b> created successfully!
+				</>
+			);
+		} else {
+			return "Preparing analysis...";
+		}
+	}
 
 	function workflowStage(): JSX.Element {
-		let text: string, variant: string, percent: number;
+		let text: any, percent: number, variant: string;
 		switch (stage) {
 			case 0:
 				text = "Copying file...";
@@ -94,28 +108,42 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 				percent = 33;
 				break;
 			case 2:
-				text = "Running Infant FreeSurfer...";
+				text = "Initializing Infant FreeSurfer...";
 				percent = 66;
 				break;
 			case 3:
-				text = "Feed created successfully! Check the Results page.";
+				text = (
+					<>
+						Infant FreeSurfer will take multiple hours to complete
+						the analysis.
+						<br />
+						<br />
+						View the{" "}
+						<a
+							href={`/results/${feedID}`}
+							style={{ textDecoration: "none" }}
+						>
+							Results
+						</a>{" "}
+						page to see its status.
+					</>
+				);
 				percent = 100;
 				variant = "success";
-				//setTimeout(function () {
-				//	props.onHide();
-				//}, 10000);
 				break;
 		}
 		return (
-			<>
-				<div>{text}</div>
+			<div className="py-4 px-5 text-center" style={{ width: "100%" }}>
+				{text}
+				<br />
+				<br />
 				<ProgressBar
-					style={{ width: "100%", height: "36px" }}
+					style={{ height: "36px" }}
 					variant={variant}
 					now={percent}
 					animated
 				/>
-			</>
+			</div>
 		);
 	}
 
@@ -124,20 +152,24 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 			show={props.show}
 			onHide={props.onHide}
 			backdrop="static"
+			size="lg"
 			centered
 		>
-			<Modal.Header className="d-flex justify-content-center">
-				<Modal.Title>Preparing analysis...</Modal.Title>
+			<Modal.Header className="justify-content-center">
+				<Modal.Title>{title()}</Modal.Title>
 			</Modal.Header>
-			<Modal.Body className="d-flex justify-content-center">
-				<div className="py-3">
-					{workflowStage()}
-					{/*<Spinner
-					animation="border"
-					style={{ width: "8rem", height: "8rem" }}
-				/>*/}
-				</div>
-			</Modal.Body>
+			<Modal.Body>{workflowStage()}</Modal.Body>
+			{stage === 3 && (
+				<Modal.Footer>
+					<Button
+						variant="outline-danger"
+						className="px-4"
+						onClick={() => props.onHide()}
+					>
+						Close
+					</Button>
+				</Modal.Footer>
+			)}
 		</Modal>
 	);
 }
