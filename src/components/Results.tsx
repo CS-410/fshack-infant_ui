@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useSharedState } from "../state";
+import { useSharedState } from "../shared/state";
 import moment from "moment";
-import { AllPluginInstanceList, Feed } from "@fnndsc/chrisapi";
+import { AllPluginInstanceList, Feed, PluginInstance } from "@fnndsc/chrisapi";
 import { overlayTooltip, feedStatusIndicator } from "./UI";
 import ClientSingleton from "../api/ClientSingleton";
 import { LinkContainer } from "react-router-bootstrap";
 import { Badge, Button, Container, Table, Pagination } from "react-bootstrap";
 import "../css/Results.css";
-import { SearchParams } from "../api/interfaces";
+import { SearchParams } from "../shared/interfaces";
+import { infantFSPluginName } from "../shared/constants";
 
 export default function Results(): JSX.Element {
 	const [state] = useSharedState();
@@ -18,7 +19,7 @@ export default function Results(): JSX.Element {
 		(async function getFeeds(): Promise<void> {
 			let feeds: Feed[] = [];
 			let searchParams: SearchParams = {
-				plugin_name: "pl-fshack-infant",
+				plugin_name: infantFSPluginName,
 				offset: 0,
 				limit: 10,
 			};
@@ -26,7 +27,7 @@ export default function Results(): JSX.Element {
 			let infantfsInstanceList: AllPluginInstanceList = await client.getPluginInstances(
 				searchParams
 			);
-			let infantfsInstances = await infantfsInstanceList.getItems();
+			let infantfsInstances: PluginInstance[] = await infantfsInstanceList.getItems();
 			while (infantfsInstanceList.hasNextPage) {
 				searchParams.offset += searchParams.limit;
 				infantfsInstanceList = await client.getPluginInstances(

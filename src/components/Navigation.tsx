@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { initialState, State, useSharedState } from "../state";
+import { initialState, State, useSharedState } from "../shared/state";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Image, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import LoginModal from "./LoginModal";
@@ -72,6 +72,9 @@ export default function Navigation(): JSX.Element {
 						<Nav className="navbar-nav me-auto">
 							<LinkContainer to="/">
 								<Nav.Link>Home</Nav.Link>
+							</LinkContainer>
+							<LinkContainer to="/about">
+								<Nav.Link>About</Nav.Link>
 							</LinkContainer>
 							<LinkContainer to="/results">
 								<Nav.Link disabled={!state.username}>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { State, useSharedState } from "../state";
-import { ModalProps } from "../api/interfaces";
+import { State, useSharedState } from "../shared/state";
+import { ModalProps } from "../shared/interfaces";
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import "../css/Navigation.css";

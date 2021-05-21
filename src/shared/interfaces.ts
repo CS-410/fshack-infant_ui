@@ -35,3 +35,7 @@ export interface SearchParams {
 	limit?: number;
 	offset?: number;
 }
+
+export interface Parameters {
+	[key: string]: string;
+}

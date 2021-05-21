@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { initialState, State, useSharedState } from "../state";
+import { initialState, State, useSharedState } from "../shared/state";
 import ClientSingleton from "../api/ClientSingleton";
 import { Modal, ModalProps, ProgressBar } from "react-bootstrap";
-import { IDirCreateData, IMedImgData, IFSHackData } from "../api/interfaces";
+import { IDirCreateData, IMedImgData, IFSHackData } from "../shared/interfaces";
 import {
 	dircopyPluginName,
 	med2ImgPluginName,
 	infantFSPluginName,
-} from "../shared/Constants";
+} from "../shared/constants";
 
 export default function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();

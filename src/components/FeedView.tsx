@@ -14,12 +14,19 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../css/FeedView.css";
 import { Loading } from "react-loading-dot";
-import { FileObj, SearchParams } from "../api/interfaces";
+import { FileObj, SearchParams, Parameters } from "../shared/interfaces";
+import {
+	feedPageParameter,
+	dircopyPluginName,
+	infantFSPluginName,
+	med2ImgPluginName,
+} from "../shared/constants";
 
 export default function FeedView(): JSX.Element {
-	const params = useParams<{ id: any }>();
-	const [ifsFiles, setIfsFiles] = useState(null);
-	const [medFiles, setMedFiles] = useState(null);
+	const params = useParams<Parameters>();
+	const feedId = params[feedPageParameter];
+	const [ifsFiles, setIfsFiles] = useState<FileObj[]>([]);
+	const [medFiles, setMedFiles] = useState<FileObj[]>([]);
 	const [uploadedFileName, setUploadedFileName] = useState<string>("");
 	const [feed, setFeed] = useState<Feed>(null);
 	const [feedStatus, setFeedStatus] = useState<number>(-1);
@@ -27,7 +34,7 @@ export default function FeedView(): JSX.Element {
 	useEffect(() => {
 		(async function () {
 			const client: Client = await ClientSingleton.getInstance();
-			const feed: Feed = await client.getFeed(parseInt(params.id));
+			const feed: Feed = await client.getFeed(parseInt(feedId));
 			setFeed(feed);
 			setFeedStatus(getFeedStatus(feed));
 		})();
@@ -39,7 +46,7 @@ export default function FeedView(): JSX.Element {
 				const pluginList: FeedPluginInstanceList = await feed.getPluginInstances();
 				for (const plugin of await pluginList.getItems()) {
 					console.log(plugin.data.plugin_name);
-					if (plugin.data.plugin_name === "pl-dircopy") {
+					if (plugin.data.plugin_name === dircopyPluginName) {
 						const dircopyParams: PluginInstanceParameterList = await plugin.getParameters();
 						const path: string = await dircopyParams.getItems()[0]
 							.data.value;
@@ -90,10 +97,10 @@ export default function FeedView(): JSX.Element {
 						}
 
 						switch (plugin.data.plugin_name) {
-							case "pl-fshack-infant":
+							case infantFSPluginName:
 								setIfsFiles(fileObjs);
 								break;
-							case "pl-med2img":
+							case med2ImgPluginName:
 								setMedFiles(fileObjs);
 								break;
 						}
@@ -127,12 +134,12 @@ export default function FeedView(): JSX.Element {
 							<h3>
 								<b>{uploadedFileName}</b>
 							</h3>
-							Created{" "}
+							{`Created `}
 							{overlayTooltip(
 								<span>{creationDate.fromNow()}</span>,
 								creationDate.format()
 							)}
-							, updated{" "}
+							{`, updated `}
 							{overlayTooltip(
 								<span>{modificationDate.fromNow()}</span>,
 								modificationDate.format()
