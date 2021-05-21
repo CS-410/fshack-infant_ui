@@ -20,28 +20,31 @@ export default class ClientSingleton {
 	}
 }
 
-export function feedStatus(feed: Feed): number {
+export function getFeedStatus(feed: Feed): number {
 	const {
 		started_jobs,
+		scheduled_jobs,
 		waiting_jobs,
-		errored_jobs,
 		cancelled_jobs,
+		errored_jobs,
 	} = feed.data;
 
-	const hasStartedJobs = started_jobs !== 0;
-	const hasWaitingJobs = waiting_jobs !== 0;
-	const hasErroredJobs = errored_jobs !== 0;
-	const hasCancelledJobs = cancelled_jobs !== 0;
+	const hasStartedJobs: boolean = started_jobs !== 0;
+	const hasScheduledJobs: boolean = scheduled_jobs !== 0;
+	const hasWaitingJobs: boolean = waiting_jobs !== 0;
+	const hasCancelledJobs: boolean = cancelled_jobs !== 0;
+	const hasErroredJobs: boolean = errored_jobs !== 0;
 
-	let status = -1;
+	let status: number = -1;
 	if (
 		!hasStartedJobs &&
+		!hasScheduledJobs &&
 		!hasWaitingJobs &&
 		!hasCancelledJobs &&
 		!hasErroredJobs
 	) {
 		status = 0;
-	} else if (hasStartedJobs || hasWaitingJobs) {
+	} else if (hasStartedJobs || hasScheduledJobs || hasWaitingJobs) {
 		status = 1;
 	} else if (hasCancelledJobs) {
 		status = 2;

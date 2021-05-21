@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { initialState, State, useSharedState } from "../State";
+import { initialState, State, useSharedState } from "../state";
 import ClientSingleton from "../api/ClientSingleton";
-import { Button, Modal, ModalProps, ProgressBar } from "react-bootstrap";
+import { Modal, ModalProps, ProgressBar } from "react-bootstrap";
 import { IDirCreateData, IMedImgData, IFSHackData } from "../api/interfaces";
 
 export default function WorkflowModal(props: ModalProps): JSX.Element {

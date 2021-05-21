@@ -1,5 +1,4 @@
 import { IPluginCreateData } from "@fnndsc/chrisapi";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export interface ModalProps {
 	show: boolean;
@@ -23,19 +22,10 @@ export interface IMedImgData extends IPluginCreateData {
 	sliceToConvert: any;
 }
 
-interface File {
+export interface File {
 	name: string;
+	path: string;
+	ext: string;
 	blob?: Blob;
 	content?: any;
-}
-
-export function toolTip(element: JSX.Element, text: string): JSX.Element {
-	return (
-		<OverlayTrigger
-			placement="bottom"
-			overlay={<Tooltip id="">{text}</Tooltip>}
-		>
-			{element}
-		</OverlayTrigger>
-	);
 }

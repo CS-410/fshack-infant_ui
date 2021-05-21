@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { State, useSharedState } from "../State";
+import { State, useSharedState } from "../state";
 import { ModalProps } from "../api/interfaces";
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
@@ -39,36 +39,6 @@ export default function LoginModal(props: ModalProps): JSX.Element {
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 
-	const usernameField: JSX.Element = (
-		<Form.Group as={Row}>
-			<Form.Label column sm={labelColSize}>
-				Username
-			</Form.Label>
-			<Col sm={fieldColSize}>
-				<Form.Control
-					ref={usernameRef}
-					type="text"
-					placeholder="chris"
-				/>
-			</Col>
-		</Form.Group>
-	);
-
-	const passwordField: JSX.Element = (
-		<Form.Group as={Row}>
-			<Form.Label column sm={labelColSize}>
-				Password
-			</Form.Label>
-			<Col sm={fieldColSize}>
-				<Form.Control
-					ref={passwordRef}
-					type="password"
-					placeholder="chris1234"
-				/>
-			</Col>
-		</Form.Group>
-	);
-
 	return (
 		<Modal show={props.show} onHide={props.onHide} centered>
 			<Modal.Header>
@@ -81,9 +51,31 @@ export default function LoginModal(props: ModalProps): JSX.Element {
 					</Alert>
 				)}
 				<Form>
-					{usernameField}
+					<Form.Group as={Row}>
+						<Form.Label column sm={labelColSize}>
+							Username
+						</Form.Label>
+						<Col sm={fieldColSize}>
+							<Form.Control
+								ref={usernameRef}
+								type="text"
+								placeholder="chris"
+							/>
+						</Col>
+					</Form.Group>
 					<br />
-					{passwordField}
+					<Form.Group as={Row}>
+						<Form.Label column sm={labelColSize}>
+							Password
+						</Form.Label>
+						<Col sm={fieldColSize}>
+							<Form.Control
+								ref={passwordRef}
+								type="password"
+								placeholder="chris1234"
+							/>
+						</Col>
+					</Form.Group>
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>

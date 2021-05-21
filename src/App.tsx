@@ -1,8 +1,7 @@
 import React from "react";
-import { SharedStateProvider } from "./State";
+import { SharedStateProvider } from "./state";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
-import FeedPage from "./components/FeedPage";
+import FeedView from "./components/FeedView";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import Navigation from "./components/Navigation";
@@ -15,7 +14,7 @@ class App extends React.Component {
 				<Router>
 					<Navigation />
 					<Switch>
-						<Route path="/results/:id" component={FeedPage} />
+						<Route path="/results/:id" component={FeedView} />
 						<Route path="/results" component={Results} />
 						<Route path="/" component={Home} />
 					</Switch>
