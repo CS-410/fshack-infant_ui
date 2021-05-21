@@ -1,6 +1,7 @@
 import { getFeedStatus } from "../api/ClientSingleton";
 import { Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
+import { Feed } from "@fnndsc/chrisapi";
 
 export function overlayTooltip(element: any, text: string): JSX.Element {
 	return (
@@ -13,7 +14,7 @@ export function overlayTooltip(element: any, text: string): JSX.Element {
 	);
 }
 
-export function feedStatusIndicator(feed: any, size: number): JSX.Element {
+export function feedStatusIndicator(feed: Feed, size: number): JSX.Element {
 	let indicator: JSX.Element;
 	if (feed) {
 		const status: number = getFeedStatus(feed);
