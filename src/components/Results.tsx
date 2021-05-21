@@ -1,31 +1,31 @@
 import { useState, useEffect } from "react";
 import { useSharedState } from "../state";
 import moment from "moment";
-import { Feed } from "@fnndsc/chrisapi";
+import { AllPluginInstanceList, Feed } from "@fnndsc/chrisapi";
 import { overlayTooltip, feedStatusIndicator } from "./UI";
 import ClientSingleton from "../api/ClientSingleton";
 import { LinkContainer } from "react-router-bootstrap";
 import { Badge, Button, Container, Table, Pagination } from "react-bootstrap";
 import "../css/Results.css";
+import { SearchParams } from "../api/interfaces";
 
 export default function Results(): JSX.Element {
 	const [state] = useSharedState();
-	const [feeds, setFeeds] = useState([]);
-	const [currentPage, setCurrentPage] = useState(1);
+	const [feeds, setFeeds] = useState<Feed[]>([]);
+	const [currentPage, setCurrentPage] = useState<number>(1);
 
 	useEffect(() => {
-		// TODO: fix duplicate feeds
 		(async function getFeeds(): Promise<void> {
 			let feeds: Feed[] = [];
-			let searchParams = {
+			let searchParams: SearchParams = {
 				plugin_name: "pl-fshack-infant",
 				offset: 0,
 				limit: 10,
 			};
 			const client = await ClientSingleton.getInstance();
-			let infantfsInstanceList = await client.getPluginInstances({
-				searchParams,
-			});
+			let infantfsInstanceList: AllPluginInstanceList = await client.getPluginInstances(
+				searchParams
+			);
 			let infantfsInstances = await infantfsInstanceList.getItems();
 			while (infantfsInstanceList.hasNextPage) {
 				searchParams.offset += searchParams.limit;
@@ -33,27 +33,29 @@ export default function Results(): JSX.Element {
 					searchParams
 				);
 				infantfsInstances = infantfsInstances.concat(
-					await infantfsInstanceList.getItems()
+					infantfsInstanceList.getItems()
 				);
 			}
-			for (let instance of infantfsInstances) {
+			for (const instance of infantfsInstances) {
 				feeds.push(await instance.getFeed());
 			}
 			setFeeds(feeds);
 		})();
 	}, []);
 
-	const feedsPerPage = 10;
-	const lastPage = Math.ceil(feeds.length / feedsPerPage);
-	const lastFeedIndex = currentPage * feedsPerPage;
-	const firstFeedIndex = lastFeedIndex - feedsPerPage;
-	const currentFeeds = feeds.slice(firstFeedIndex, lastFeedIndex);
+	const feedsPerPage: number = 10;
+	const lastPage: number = Math.ceil(feeds.length / feedsPerPage);
+	const lastFeedIndex: number = currentPage * feedsPerPage;
+	const firstFeedIndex: number = lastFeedIndex - feedsPerPage;
+	const currentFeeds: any[] = feeds.slice(firstFeedIndex, lastFeedIndex);
 
 	function tableEntry(feed: Feed, index: number): JSX.Element {
 		const { id, name, creation_date, modification_date } = feed.data;
-		const creationDate = moment(creation_date);
-		const modificationDate = moment(modification_date);
-		const isNew = creationDate.isAfter(moment().subtract(2, "days"));
+		const creationDate: moment.Moment = moment(creation_date);
+		const modificationDate: moment.Moment = moment(modification_date);
+		const isNew: boolean = creationDate.isAfter(
+			moment().subtract(2, "days")
+		);
 
 		return (
 			<tr key={index}>
@@ -65,7 +67,7 @@ export default function Results(): JSX.Element {
 						creationDate.format()
 					)}
 					{isNew && (
-						<Badge pill className="bg-secondary mx-2">
+						<Badge className="bg-secondary mx-2" pill>
 							New
 						</Badge>
 					)}

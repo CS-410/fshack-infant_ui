@@ -22,10 +22,16 @@ export interface IMedImgData extends IPluginCreateData {
 	sliceToConvert: any;
 }
 
-export interface File {
-	name: string;
+export interface FileObj {
 	path: string;
+	name: string;
 	ext: string;
 	blob?: Blob;
 	content?: any;
+}
+
+export interface SearchParams {
+	plugin_name?: string;
+	limit?: number;
+	offset?: number;
 }

@@ -1,22 +1,20 @@
 import { useState, useEffect } from "react";
-import {
-	Row,
-	Col,
-	ListGroup,
-	Container,
-	Table,
-	Badge,
-	Tab,
-} from "react-bootstrap";
+import { Row, Col, ListGroup, Container, Badge, Tab } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton, { getFeedStatus } from "../api/ClientSingleton";
 import { overlayTooltip, feedStatusIndicator } from "./UI";
 import moment from "moment";
-import { Feed } from "@fnndsc/chrisapi";
+import Client, {
+	Feed,
+	FeedPluginInstanceList,
+	PluginInstanceFileList,
+	PluginInstanceParameterList,
+} from "@fnndsc/chrisapi";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../css/FeedView.css";
 import { Loading } from "react-loading-dot";
+import { FileObj, SearchParams } from "../api/interfaces";
 
 export default function FeedView(): JSX.Element {
 	const params = useParams<{ id: any }>();
@@ -28,8 +26,8 @@ export default function FeedView(): JSX.Element {
 
 	useEffect(() => {
 		(async function () {
-			const client = await ClientSingleton.getInstance();
-			const feed = await client.getFeed(parseInt(params.id));
+			const client: Client = await ClientSingleton.getInstance();
+			const feed: Feed = await client.getFeed(parseInt(params.id));
 			setFeed(feed);
 			setFeedStatus(getFeedStatus(feed));
 		})();
@@ -38,34 +36,39 @@ export default function FeedView(): JSX.Element {
 	useEffect(() => {
 		(async function () {
 			if (feed) {
-				const pluginList = await feed.getPluginInstances();
+				const pluginList: FeedPluginInstanceList = await feed.getPluginInstances();
 				for (const plugin of await pluginList.getItems()) {
 					console.log(plugin.data.plugin_name);
 					if (plugin.data.plugin_name === "pl-dircopy") {
-						const dircopyParams = await plugin.getParameters();
-						const path = await dircopyParams.getItems()[0].data
-							.value;
-						const name = path.replace(/^.*[\\\/]/, "");
+						const dircopyParams: PluginInstanceParameterList = await plugin.getParameters();
+						const path: string = await dircopyParams.getItems()[0]
+							.data.value;
+						const name: string = path.replace(/^.*[\\\/]/, "");
 						setUploadedFileName(name);
 					} else if (feedStatus === 0) {
-						const fileParams = { offset: 0, limit: 200 };
-						let fileList = await plugin.getFiles(fileParams);
+						const searchParams: SearchParams = {
+							offset: 0,
+							limit: 200,
+						};
+						let fileList: PluginInstanceFileList = await plugin.getFiles(
+							searchParams
+						);
 						let files = await fileList.getItems();
 						while (fileList.hasNextPage) {
-							fileParams.offset += fileParams.limit;
-							fileList = await plugin.getFiles(fileParams);
+							searchParams.offset += searchParams.limit;
+							fileList = await plugin.getFiles(searchParams);
 							files = files.concat(await fileList.getItems());
 						}
 
-						let fileObjs = [];
+						let fileObjs: FileObj[] = [];
 						for (const file of files) {
-							const path = file.data.fname;
-							const name = path.replace(/^.*[\\\/]/, "");
-							const ext = name.split(".").pop();
+							const path: string = file.data.fname;
+							const name: string = path.replace(/^.*[\\\/]/, "");
+							const ext: string = name.split(".").pop();
 							if (!["png", "jpg", "stats"].includes(ext))
 								continue;
-							const blob = await file.getFileBlob();
-							let fileObj = {
+							const blob: Blob = await file.getFileBlob();
+							let fileObj: FileObj = {
 								path: path,
 								name: name,
 								ext: ext,
@@ -113,8 +116,8 @@ export default function FeedView(): JSX.Element {
 				errored_jobs,
 			} = feed.data;
 
-			const creationDate = moment(creation_date);
-			const modificationDate = moment(modification_date);
+			const creationDate: moment.Moment = moment(creation_date);
+			const modificationDate: moment.Moment = moment(modification_date);
 
 			return (
 				<Row>
@@ -177,107 +180,115 @@ export default function FeedView(): JSX.Element {
 	}
 
 	function results(): JSX.Element {
-		function itemList(files: any) {
-			return files.map((file: any) => {
+		function itemList(fileObjs: FileObj[]) {
+			return fileObjs.map((fileObj: FileObj) => {
 				return (
-					<ListGroup.Item href={`#${file.name}`} action>
-						{file.name}
+					<ListGroup.Item href={`#${fileObj.name}`} action>
+						{fileObj.name}
 					</ListGroup.Item>
 				);
 			});
 		}
 
-		function itemContent(fileObjs: any) {
-			return fileObjs.map((fileObj: any) => {
-				let pane = fileObj.content;
+		function itemContent(fileObjs: FileObj[]) {
+			return fileObjs.map((fileObj: FileObj) => {
+				let content: any;
 				if (fileObj.ext === "stats") {
-					pane = parseStats(fileObj.content);
+					content = parseStats(fileObj.content);
 				} else if (fileObj.ext === "png") {
-					pane = <img width="75%" src={fileObj.content} />;
+					content = <img width="75%" src={fileObj.content} />;
+				} else {
+					content = fileObj.content;
 				}
 				return (
 					<Tab.Pane
 						style={{ height: "900px" }}
 						eventKey={`#${fileObj.name}`}
 					>
-						{pane}
+						{content}
 					</Tab.Pane>
 				);
 			});
 		}
 
 		function parseStats(content: string) {
-			const lines = content.split("\n");
-			let head: any = [];
-			let body: any = [];
-			for (const line of lines) {
-				if (line.startsWith("# TableCol")) {
-					const row = line
-						.split("# TableCol")[1]
-						.split(" ")
-						.filter((i: string) => i);
-					const index: number = parseInt(row[0]);
-					const title: string = row[1];
-					const data: string = row.slice(2).join(" ");
-					if (!head[index - 1]) head[index - 1] = {};
-					head[index - 1][title] = data;
-				} else if (!line.startsWith("#")) {
-					body.push(line.split(" ").filter((i: string) => i));
+			if (content.includes("# ColHeaders")) {
+				const lines: string[] = content.split("\n");
+				let head: any = [];
+				let body: any = [];
+				for (const line of lines) {
+					if (line.startsWith("# TableCol")) {
+						const row: string[] = line
+							.split("# TableCol")[1]
+							.split(" ")
+							.filter((i: string) => i);
+						const index: number = parseInt(row[0]);
+						const title: string = row[1];
+						const data: string = row.slice(2).join(" ");
+						if (!head[index - 1]) head[index - 1] = {};
+						head[index - 1][title] = data;
+					} else if (!line.startsWith("#")) {
+						body.push(line.split(" ").filter((i: string) => i));
+					}
 				}
-			}
 
-			try {
-				if (head[0]["ColHeader"] === "Index") {
-					head = head.slice(1);
-					body = body.slice(1);
-				}
-			} catch {}
+				const columnNames: string[] = head.map((col: any) => {
+					const unit: string = ![
+						"NA",
+						"unitless",
+						"unknown",
+						"none",
+					].includes(col.Units)
+						? ` (${col.Units})`
+						: "";
+					return col.FieldName + unit;
+				});
 
-			const columnNames = head.map((col: any) => {
-				const unit = !["NA", "unitless"].includes(col.Units)
-					? ` (${col.Units})`
-					: "";
-				return col.FieldName + unit;
-			});
-
-			const table = (
-				<Table responsive size="sm">
-					<thead>
-						<tr>
-							{head.map((col: any) => (
-								<th>{col}</th>
-							))}
-						</tr>
-					</thead>
-					<tbody>
-						{body.map((row: any) => (
+				/*
+				const table: JSX.Element = (
+					<Table responsive size="sm">
+						<thead>
 							<tr>
-								{row.map((col: any) => (
-									<td>{col}</td>
+								{head.map((col: any) => (
+									<th>{col}</th>
 								))}
 							</tr>
-						))}
-					</tbody>
-				</Table>
-			);
+						</thead>
+						<tbody>
+							{body.map((row: any) => (
+								<tr>
+									{row.map((col: any) => (
+										<td>{col}</td>
+									))}
+								</tr>
+							))}
+						</tbody>
+					</Table>
+				);
+				*/
 
-			const doc = new jsPDF({
-				orientation: "landscape",
-			});
+				const doc = new jsPDF({ orientation: "landscape" });
+				autoTable(doc, {
+					theme: "plain",
+					styles: { font: "courier" },
+					head: [columnNames],
+					body: body,
+				});
 
-			autoTable(doc, {
-				theme: "plain",
-				head: [columnNames],
-				body: body,
-			});
-
-			return (
-				<embed
-					width="100%"
-					height="100%"
-					src={`${doc.output("dataurlstring")}#navpanes=0`}
-				/>
-			);
+				return (
+					<embed
+						width="100%"
+						height="100%"
+						src={`${doc.output("dataurlstring")}#navpanes=0`}
+					/>
+				);
+			} else {
+				return (
+					<pre>
+						<code>{content}</code>
+					</pre>
+				);
+			}
 		}
 
 		if (ifsFiles && medFiles) {
@@ -291,7 +302,7 @@ export default function FeedView(): JSX.Element {
 							</ListGroup>
 						</Col>
 						<Col sm={9}>
-							<Tab.Content className="text-center">
+							<Tab.Content>
 								{itemContent(ifsFiles)}
 								{itemContent(medFiles)}
 							</Tab.Content>
@@ -300,6 +311,14 @@ export default function FeedView(): JSX.Element {
 				</Tab.Container>
 			);
 		} else {
+			const statusText = (text: any) => {
+				return (
+					<h4 className="py-5 d-flex justify-content-center">
+						{text}
+					</h4>
+				);
+			};
+
 			let text: any = (
 				<Col className="d-flex justify-content-center">
 					<Row>Loading results...</Row>
@@ -308,13 +327,6 @@ export default function FeedView(): JSX.Element {
 					</Row>
 				</Col>
 			);
-			const statusText = (text: any) => {
-				return (
-					<h4 className="py-5 d-flex justify-content-center">
-						{text}
-					</h4>
-				);
-			};
 			if (feed && feedStatus === 1) {
 				text = "This analysis hasn't finished running yet.";
 			} else if (feed && feedStatus === 2) {
@@ -322,6 +334,7 @@ export default function FeedView(): JSX.Element {
 			} else if (feed && feedStatus === 3) {
 				text = "This analysis encountered an error. Please try again.";
 			}
+
 			return statusText(text);
 		}
 	}
