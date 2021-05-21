@@ -14,7 +14,7 @@ import {
 } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import "../css/Results.css";
-import { Feed } from "@fnndsc/chrisapi";
+import { Feed, PluginInstance } from "@fnndsc/chrisapi";
 
 function Results(): JSX.Element {
 	const [feeds, setFeeds] = useState<Feed[]>([]);
@@ -58,14 +58,28 @@ function Results(): JSX.Element {
 async function getFeeds(
 	feedsSetter: (value: React.SetStateAction<Feed[]>) => void
 ): Promise<void> {
+	const client = await ClientSingleton.getInstance();
+	const instanceParams = {
+		plugin_name: "pl-fshack-infant",
+		limit: 10,
+		offset: 0,
+	};
+
+	let infantfsInstances = await client.getPluginInstances(instanceParams);
+	let instances: PluginInstance[] = infantfsInstances.getItems();
 	let feeds: Feed[] = [];
 
-	const client = await ClientSingleton.getInstance();
-	const infantfsInstances = await client.getPluginInstances({
-		plugin_name: "pl-fshack-infant",
-	});
+	while (infantfsInstances.hasNextPage) {
+		try {
+			instanceParams.offset += instanceParams.limit;
+			infantfsInstances = await client.getPluginInstances(instanceParams);
+			instances = instances.concat(infantfsInstances.getItems());
+		} catch (error) {
+			throw new Error("Error while paginating feeds");
+		}
+	}
 
-	for (let instance of infantfsInstances.getItems()) {
+	for (let instance of instances) {
 		const feed = await instance.getFeed();
 		feeds.push(feed);
 	}

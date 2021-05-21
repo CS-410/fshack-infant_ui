@@ -1299,7 +1299,7 @@ declare module "@fnndsc/chrisapi" {
      *
      * @type {boolean}
      */
-    get isEmpty();
+    get isEmpty(): boolean;
 
     /**
      * Return true if the list resource object has a next list page in the
@@ -1307,7 +1307,7 @@ declare module "@fnndsc/chrisapi" {
      *
      * @type {boolean}
      */
-    get hasNextPage()
+    get hasNextPage(): boolean;
 
     /**
      * Return true if the list resource object has a previous list page in the

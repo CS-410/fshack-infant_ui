@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Container, Table, ListGroup, Tab, Row, Col } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton from "../api/ClientSingleton";
-import Client, { FeedFile, PluginInstance } from "@fnndsc/chrisapi";
+import Client, {
+	FeedFile,
+	PluginInstance,
+	PluginInstanceFileList,
+} from "@fnndsc/chrisapi";
 import {
 	infantFSPluginName,
 	med2ImgPluginName,
@@ -12,7 +16,7 @@ import {
 } from "../shared/Constants";
 
 interface Parameters {
-	[key: string]: any;
+	[key: string]: string;
 }
 
 interface File {
@@ -66,13 +70,13 @@ function FeedPage(): JSX.Element {
 }
 
 async function getPluginAndFiles(
-	id: string,
+	feedId: string,
 	pluginName: string,
 	pluginSetter: (value: React.SetStateAction<PluginInstance>) => void,
 	filesSetter: (value: React.SetStateAction<File[]>) => void
 ): Promise<void> {
 	const client = await ClientSingleton.getInstance();
-	const plugin: PluginInstance = await getPlugin(client, id, pluginName);
+	const plugin: PluginInstance = await getPlugin(client, feedId, pluginName);
 	pluginSetter(plugin);
 
 	const feedFiles: FeedFile[] = await getFeedFiles(plugin);
@@ -82,14 +86,14 @@ async function getPluginAndFiles(
 
 async function getPlugin(
 	client: Client,
-	id: string,
+	feedId: string,
 	pluginName: string
 ): Promise<PluginInstance> {
 	const pluginInstance = await client.getPluginInstances({
 		limit: 25,
 		offset: 0,
 		plugin_name: pluginName,
-		feed_id: id,
+		feed_id: feedId,
 	});
 
 	const plugin: PluginInstance = pluginInstance.getItems()[0];
@@ -99,7 +103,9 @@ async function getPlugin(
 
 async function getFeedFiles(plugin: PluginInstance): Promise<FeedFile[]> {
 	const fileParams = { limit: 200, offset: 0 };
-	let pluginInstanceFiles = await plugin.getFiles(fileParams);
+	let pluginInstanceFiles: PluginInstanceFileList = await plugin.getFiles(
+		fileParams
+	);
 	let feedFiles: FeedFile[] = pluginInstanceFiles.getItems();
 
 	while (pluginInstanceFiles.hasNextPage) {
@@ -107,7 +113,7 @@ async function getFeedFiles(plugin: PluginInstance): Promise<FeedFile[]> {
 			fileParams.offset += fileParams.limit;
 			pluginInstanceFiles = await plugin.getFiles(fileParams);
 			feedFiles = feedFiles.concat(pluginInstanceFiles.getItems());
-		} catch (e) {
+		} catch (error) {
 			throw new Error("Error while paginating files");
 		}
 	}
