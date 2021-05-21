@@ -74,3 +74,8 @@
 		box-shadow: 10014px 0 0 -5px #9880ff;
 	}
 }
+
+#loadingDots > div {
+	margin-top: -8rem;
+	margin-left: -0.8rem;
+}

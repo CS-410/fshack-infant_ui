@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { State, useSharedState } from "../state";
-import { ModalProps } from "../api/interfaces";
+import { State, useSharedState } from "../shared/state";
+import { ModalProps } from "../shared/interfaces";
 import Client from "@fnndsc/chrisapi";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import "../css/Navigation.css";
 
 export default function LoginModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
-	const [invalidLogin, setInvalidLogin] = useState(false);
+	const [invalidLogin, setInvalidLogin] = useState<boolean>(false);
 
 	async function onLogin(): Promise<void> {
 		try {
-			const authUrl = process.env.REACT_APP_API_URL + "auth-token/";
-			const username = usernameRef.current.value;
-			const password = passwordRef.current.value;
+			const authUrl: string = process.env.REACT_APP_API_URL + "auth-token/";
+			const username: string = usernameRef.current.value;
+			const password: string = passwordRef.current.value;
 			const authToken = await Client.getAuthToken(
 				authUrl,
 				username,
@@ -35,7 +35,7 @@ export default function LoginModal(props: ModalProps): JSX.Element {
 		}
 	}
 
-	const labelColSize = 3, fieldColSize = 9;
+	const labelColSize: number = 3, fieldColSize: number = 9;
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { State, useSharedState } from "../state";
+import { State, useSharedState } from "../shared/state";
 import ClientSingleton from "../api/ClientSingleton";
 import WorkflowModal from "./WorkflowModal";
 import {
@@ -16,7 +16,7 @@ export default function Upload(): JSX.Element {
 	const [state, setState] = useSharedState();
 
 	async function onFileUpload(): Promise<void> {
-		const client = await ClientSingleton.getInstance();
+		/*const client = await ClientSingleton.getInstance();
 		const uploadedFile = await client.uploadFile(
 			{
 				upload_path: `${state.username}/uploads/pl-fshack-infant/${state.selectedFile.name}`,
@@ -24,11 +24,11 @@ export default function Upload(): JSX.Element {
 			{
 				fname: state.selectedFile,
 			}
-		);
+		);*/
 		setState((prev: State) => {
 			return {
 				...prev,
-				uploadedFile: uploadedFile,
+				//uploadedFile: uploadedFile,
 				showWorkflow: true,
 			};
 		});

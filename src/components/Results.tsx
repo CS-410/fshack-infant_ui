@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useSharedState } from "../state";
+import { useSharedState } from "../shared/state";
 import moment from "moment";
 import { AllPluginInstanceList, Feed } from "@fnndsc/chrisapi";
-import { overlayTooltip, feedStatusIndicator } from "./UI";
+import { overlayTooltip, feedStatusIndicator } from "../shared/UI";
 import ClientSingleton from "../api/ClientSingleton";
 import { LinkContainer } from "react-router-bootstrap";
 import { Badge, Button, Container, Table, Pagination } from "react-bootstrap";
 import "../css/Results.css";
-import { SearchParams } from "../api/interfaces";
+import { SearchParams } from "../shared/interfaces";
+import { pluginName, timeFormat } from "../shared/constants";
 
 export default function Results(): JSX.Element {
 	const [state] = useSharedState();
@@ -18,7 +19,7 @@ export default function Results(): JSX.Element {
 		(async function getFeeds(): Promise<void> {
 			let feeds: Feed[] = [];
 			let searchParams: SearchParams = {
-				plugin_name: "pl-fshack-infant",
+				plugin_name: pluginName.infantFs,
 				offset: 0,
 				limit: 10,
 			};
@@ -64,7 +65,7 @@ export default function Results(): JSX.Element {
 				<td>
 					{overlayTooltip(
 						<span>{creationDate.fromNow()}</span>,
-						creationDate.format()
+						creationDate.format(timeFormat)
 					)}
 					{isNew && (
 						<Badge className="bg-secondary mx-2" pill>
@@ -75,7 +76,7 @@ export default function Results(): JSX.Element {
 				<td>
 					{overlayTooltip(
 						<span>{modificationDate.fromNow()}</span>,
-						modificationDate.format()
+						modificationDate.format(timeFormat)
 					)}
 				</td>
 				<td>{feedStatusIndicator(feed, 24)}</td>

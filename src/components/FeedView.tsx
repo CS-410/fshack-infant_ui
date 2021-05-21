@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Row, Col, ListGroup, Container, Badge, Tab } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import ClientSingleton, { getFeedStatus } from "../api/ClientSingleton";
-import { overlayTooltip, feedStatusIndicator } from "./UI";
+import { overlayTooltip, feedStatusIndicator } from "../shared/UI";
 import moment from "moment";
 import Client, {
 	Feed,
@@ -14,7 +14,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../css/FeedView.css";
 import { Loading } from "react-loading-dot";
-import { FileObj, SearchParams } from "../api/interfaces";
+import { FileObj, SearchParams } from "../shared/interfaces";
+import { pluginName, timeFormat } from "../shared/constants";
 
 export default function FeedView(): JSX.Element {
 	const params = useParams<{ id: any }>();
@@ -38,8 +39,7 @@ export default function FeedView(): JSX.Element {
 			if (feed) {
 				const pluginList: FeedPluginInstanceList = await feed.getPluginInstances();
 				for (const plugin of await pluginList.getItems()) {
-					console.log(plugin.data.plugin_name);
-					if (plugin.data.plugin_name === "pl-dircopy") {
+					if (plugin.data.plugin_name === pluginName.dircopy) {
 						const dircopyParams: PluginInstanceParameterList = await plugin.getParameters();
 						const path: string = await dircopyParams.getItems()[0]
 							.data.value;
@@ -90,10 +90,10 @@ export default function FeedView(): JSX.Element {
 						}
 
 						switch (plugin.data.plugin_name) {
-							case "pl-fshack-infant":
+							case pluginName.infantFs:
 								setIfsFiles(fileObjs);
 								break;
-							case "pl-med2img":
+							case pluginName.med2img:
 								setMedFiles(fileObjs);
 								break;
 						}
@@ -130,12 +130,12 @@ export default function FeedView(): JSX.Element {
 							Created{" "}
 							{overlayTooltip(
 								<span>{creationDate.fromNow()}</span>,
-								creationDate.format()
+								creationDate.format(timeFormat)
 							)}
 							, updated{" "}
 							{overlayTooltip(
 								<span>{modificationDate.fromNow()}</span>,
-								modificationDate.format()
+								modificationDate.format(timeFormat)
 							)}
 						</div>
 						<div className="py-2">
@@ -215,6 +215,7 @@ export default function FeedView(): JSX.Element {
 			if (content.includes("# ColHeaders")) {
 				const lines: string[] = content.split("\n");
 				let head: any = [];
+				let measure: any = [];
 				let body: any = [];
 				for (const line of lines) {
 					if (line.startsWith("# TableCol")) {
@@ -227,6 +228,12 @@ export default function FeedView(): JSX.Element {
 						const data: string = row.slice(2).join(" ");
 						if (!head[index - 1]) head[index - 1] = {};
 						head[index - 1][title] = data;
+					} else if (line.startsWith("# Measure")) {
+						const row = line
+							.split("# Measure")[1]
+							.split(", ")
+							.slice(1);
+						console.log(row);
 					} else if (!line.startsWith("#")) {
 						body.push(line.split(" ").filter((i: string) => i));
 					}
@@ -321,9 +328,11 @@ export default function FeedView(): JSX.Element {
 
 			let text: any = (
 				<Col className="d-flex justify-content-center">
-					<Row>Loading results...</Row>
 					<Row>
-						<Loading dots="3" background="#000" size="1rem" />
+						Loading results...
+						<div id="loadingDots">
+							<Loading dots="3" background="#000" size="1rem" />
+						</div>
 					</Row>
 				</Col>
 			);
