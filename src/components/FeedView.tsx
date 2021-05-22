@@ -307,24 +307,7 @@ function results(state: FeedViewState): JSX.Element {
 			</Tab.Container>
 		);
 	} else {
-		let text: JSX.Element | string = (
-			<Col className="d-flex justify-content-center">
-				<Row>Loading results...</Row>
-				<Row>
-					<Loading dots="3" background="#000" size="1rem" />
-				</Row>
-			</Col>
-		);
-
-		if (feed) {
-			if (feedStatus === 1) {
-				text = "This analysis hasn't finished running yet.";
-			} else if (feedStatus === 2) {
-				text = "This analysis was cancelled.";
-			} else if (feedStatus === 3) {
-				text = "This analysis encountered an error. Please try again.";
-			}
-		}
+		const text: JSX.Element | string = getText(feed, feedStatus);
 		const statusText = (
 			<h4 className="py-5 d-flex justify-content-center">{text}</h4>
 		);
