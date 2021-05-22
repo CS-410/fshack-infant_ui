@@ -11,12 +11,13 @@ import {
 	Image,
 } from "react-bootstrap";
 import brainImage from "../assets/brain.svg";
+import { overlayTooltip } from "../shared/UI";
 
 export default function Upload(): JSX.Element {
 	const [state, setState] = useSharedState();
 
 	async function onFileUpload(): Promise<void> {
-		/*const client = await ClientSingleton.getInstance();
+		const client = await ClientSingleton.getInstance();
 		const uploadedFile = await client.uploadFile(
 			{
 				upload_path: `${state.username}/uploads/pl-fshack-infant/${state.selectedFile.name}`,
@@ -24,11 +25,11 @@ export default function Upload(): JSX.Element {
 			{
 				fname: state.selectedFile,
 			}
-		);*/
+		);
 		setState((prev: State) => {
 			return {
 				...prev,
-				//uploadedFile: uploadedFile,
+				uploadedFile: uploadedFile,
 				showWorkflow: true,
 			};
 		});
@@ -111,10 +112,15 @@ export default function Upload(): JSX.Element {
 					<Alert variant="primary" className="text-center pt-5">
 						{state.selectedFile && (
 							<h5>
-								<span title={state.selectedFile.name}>
-									<b>Selected file:</b>{" "}
-									{truncateFileName(state.selectedFile.name)}
-								</span>
+								{overlayTooltip(
+									<span>
+										<b>Selected file:</b>{" "}
+										{truncateFileName(
+											state.selectedFile.name
+										)}
+									</span>,
+									state.selectedFile.name
+								)}
 							</h5>
 						)}
 						<Image

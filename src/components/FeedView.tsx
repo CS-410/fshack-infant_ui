@@ -140,7 +140,7 @@ export default function FeedView(): JSX.Element {
 						</div>
 						<div className="py-2">
 							{started_jobs !== 0 && (
-								<Badge pill className="bg-secondary">
+								<Badge pill className="bg-dark">
 									Started: {started_jobs}
 								</Badge>
 							)}
@@ -152,7 +152,7 @@ export default function FeedView(): JSX.Element {
 							)}
 							{` `}
 							{scheduled_jobs !== 0 && (
-								<Badge pill className="bg-dark">
+								<Badge pill className="bg-secondary">
 									Scheduled: {scheduled_jobs}
 								</Badge>
 							)}
@@ -194,7 +194,7 @@ export default function FeedView(): JSX.Element {
 			return fileObjs.map((fileObj: FileObj) => {
 				let content: any;
 				if (fileObj.ext === "stats") {
-					content = parseStats(fileObj.content);
+					content = processStats(fileObj.content);
 				} else if (fileObj.ext === "png") {
 					content = <img width="75%" src={fileObj.content} />;
 				} else {
@@ -211,12 +211,12 @@ export default function FeedView(): JSX.Element {
 			});
 		}
 
-		function parseStats(content: string) {
-			if (content.includes("# ColHeaders")) {
+		function processStats(content: string) {
+			if (content[0] === "#") {
 				const lines: string[] = content.split("\n");
-				let head: any = [];
+				let mainHead: any = [];
+				let mainBody: any = [];
 				let measure: any = [];
-				let body: any = [];
 				for (const line of lines) {
 					if (line.startsWith("# TableCol")) {
 						const row: string[] = line
@@ -226,43 +226,66 @@ export default function FeedView(): JSX.Element {
 						const index: number = parseInt(row[0]);
 						const title: string = row[1];
 						const data: string = row.slice(2).join(" ");
-						if (!head[index - 1]) head[index - 1] = {};
-						head[index - 1][title] = data;
+						if (!mainHead[index - 1]) mainHead[index - 1] = {};
+						mainHead[index - 1][title] = data;
 					} else if (line.startsWith("# Measure")) {
 						const row = line
 							.split("# Measure")[1]
 							.split(", ")
 							.slice(1);
-						console.log(row);
+						row[2] = parseFloat(row[2]).toFixed(3);
+						measure.push(row);
 					} else if (!line.startsWith("#")) {
-						body.push(line.split(" ").filter((i: string) => i));
+						mainBody.push(line.split(" ").filter((i: string) => i));
 					}
 				}
 
-				const columnNames: string[] = head.map((col: any) => {
-					const unit: string = ![
-						"NA",
-						"unitless",
-						"unknown",
-						"none",
-					].includes(col.Units)
-						? ` (${col.Units})`
-						: "";
-					return col.FieldName + unit;
-				});
+				const getColumnNames = (
+					array: [],
+					descCol: string,
+					unitCol: string
+				) =>
+					array.map((col: any) => {
+						const unit: string = ![
+							"NA",
+							"unitless",
+							"unknown",
+							"none",
+						].includes(eval(unitCol))
+							? ` (${eval(unitCol)})`
+							: "";
+						return eval(descCol) + unit;
+					});
+
+				const headColumnNames: string[] = getColumnNames(
+					mainHead,
+					"col.FieldName",
+					"col.Units"
+				);
+
+				const measureColumnNames: string[] = getColumnNames(
+					measure,
+					"col[1]",
+					"col[3]"
+				);
+				const measureBody = measureColumnNames.map(
+					(row: string, i: any) => {
+						return [row, measure[i][2]];
+					}
+				);
 
 				/*
 				const table: JSX.Element = (
 					<Table responsive size="sm">
 						<thead>
 							<tr>
-								{head.map((col: any) => (
+								{mainHead.map((col: any) => (
 									<th>{col}</th>
 								))}
 							</tr>
 						</thead>
 						<tbody>
-							{body.map((row: any) => (
+							{mainBody.map((row: any) => (
 								<tr>
 									{row.map((col: any) => (
 										<td>{col}</td>
@@ -275,11 +298,25 @@ export default function FeedView(): JSX.Element {
 				*/
 
 				const doc = new jsPDF({ orientation: "landscape" });
+
+				if (measure) {
+					autoTable(doc, {
+						theme: "plain",
+						styles: { font: "courier" },
+						showHead: false,
+						columnStyles: {
+							0: { fontStyle: "bold" },
+						},
+						head: [["", ""]],
+						body: measureBody,
+					});
+				}
+
 				autoTable(doc, {
 					theme: "plain",
 					styles: { font: "courier" },
-					head: [columnNames],
-					body: body,
+					head: [headColumnNames],
+					body: mainBody,
 				});
 
 				return (

@@ -4,7 +4,6 @@ import ClientSingleton from "../api/ClientSingleton";
 import { Button, Modal, ModalProps, ProgressBar } from "react-bootstrap";
 import { IDirCreateData, IMedImgData, IFSHackData } from "../shared/interfaces";
 import { pluginName } from "../shared/constants";
-import { Feed } from "@fnndsc/chrisapi";
 
 export default function WorkflowModal(props: ModalProps): JSX.Element {
 	const [state, setState] = useSharedState();
@@ -99,7 +98,7 @@ export default function WorkflowModal(props: ModalProps): JSX.Element {
 		switch (stage) {
 			case 0:
 				text = "Copying file...";
-				percent = 0;
+				percent = 10;
 				break;
 			case 1:
 				text = "Generating image...";
