@@ -367,17 +367,44 @@ function itemContent(fileObjs: FileObj[]): JSX.Element[] {
 }
 
 function parseStats(content: string): JSX.Element {
-	if (content.includes("# ColHeaders")) {
+	if (content[0] === "#") {
 		const lines: string[] = content.split("\n");
-		let { head, body }: TableStructure = getTableStructure(lines);
+		let { head, body, measure } = getTableStructure(lines);
 
-		const columnNames: string[] = getColumnNames(head);
+		const headColumnNames: string[] = getColumnNames(
+			head,
+			"col.FieldName",
+			"col.Units"
+		);
+
+		const measureColumnNames: string[] = getColumnNames(
+			measure,
+			"col[1]",
+			"col[3]"
+		);
+		const measureBody = measureColumnNames.map((row: string, i: any) => {
+			return [row, measure[i][2]];
+		});
 
 		const doc = new jsPDF({ orientation: "landscape" });
+
+		if (measure) {
+			autoTable(doc, {
+				theme: "plain",
+				styles: { font: "courier" },
+				showHead: false,
+				columnStyles: {
+					0: { fontStyle: "bold" },
+				},
+				head: [["", ""]],
+				body: measureBody,
+			});
+		}
+
 		autoTable(doc, {
 			theme: "plain",
 			styles: { font: "courier" },
-			head: [columnNames],
+			head: [headColumnNames],
 			body: body,
 		});
 
@@ -397,9 +424,10 @@ function parseStats(content: string): JSX.Element {
 	}
 }
 
-function getTableStructure(lines: string[]): TableStructure {
-	let head: TableHeader = [];
-	let body: TableBody = [];
+function getTableStructure(lines: string[]) {
+	let head: any = [];
+	let body: any = [];
+	let measure: any = [];
 	for (const line of lines) {
 		if (line.startsWith("# TableCol")) {
 			const row: string[] = line
@@ -415,21 +443,25 @@ function getTableStructure(lines: string[]): TableStructure {
 			}
 
 			head[index - 1][title] = data;
+		} else if (line.startsWith("# Measure")) {
+			const row = line.split("# Measure")[1].split(", ").slice(1);
+			row[2] = parseFloat(row[2]).toFixed(3);
+			measure.push(row);
 		} else if (!line.startsWith("#")) {
 			body.push(line.split(" ").filter((i: string) => i));
 		}
 	}
 
-	return { head, body };
+	return { head, body, measure };
 }
 
-function getColumnNames(head: any): string[] {
-	return head.map((col: any) => {
+function getColumnNames(array: [], descCol: string, unitCol: string) {
+	return array.map((col: any) => {
 		const unit: string = !["NA", "unitless", "unknown", "none"].includes(
-			col.Units
+			eval(unitCol)
 		)
-			? ` (${col.Units})`
+			? ` (${eval(unitCol)})`
 			: "";
-		return col.FieldName + unit;
+		return eval(descCol) + unit;
 	});
 }
