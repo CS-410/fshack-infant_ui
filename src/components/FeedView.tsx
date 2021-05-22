@@ -50,10 +50,6 @@ function feedViewReducer(
 			return { ...state, medFiles: value as FileObj[] };
 		case "setUploadedFileName":
 			return { ...state, uploadedFileName: value as string };
-		case "setFeed":
-			return { ...state, feed: value as Feed };
-		case "setFeedStatus":
-			return { ...state, feedStatus: value as number };
 		case "setFeedAndStatus":
 			const { feed, feedStatus } = value as {
 				feed: Feed;

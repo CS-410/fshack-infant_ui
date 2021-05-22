@@ -35,8 +35,8 @@ export default function LoginModal(props: ModalProps): JSX.Element {
 		}
 	}
 
-	const labelColSize = 3,
-		fieldColSize = 9;
+	const labelColSize = 3;
+	const fieldColSize = 9;
 	const usernameRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 	const passwordRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 

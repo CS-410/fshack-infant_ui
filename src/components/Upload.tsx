@@ -11,19 +11,22 @@ import {
 	Image,
 } from "react-bootstrap";
 import brainImage from "../assets/brain.svg";
+import { IRequestData, IUploadFileObj } from "@fnndsc/chrisapi";
 
 export default function Upload(): JSX.Element {
 	const [state, setState] = useSharedState();
 
 	async function onFileUpload(): Promise<void> {
 		const client = await ClientSingleton.getInstance();
+		const requestData: IRequestData = {
+			upload_path: `${state.username}/uploads/pl-fshack-infant/${state.selectedFile.name}`,
+		};
+		const uploadFileObj: IUploadFileObj = {
+			fname: state.selectedFile,
+		};
 		const uploadedFile = await client.uploadFile(
-			{
-				upload_path: `${state.username}/uploads/pl-fshack-infant/${state.selectedFile.name}`,
-			},
-			{
-				fname: state.selectedFile,
-			}
+			requestData,
+			uploadFileObj
 		);
 		setState((prev: State) => {
 			return {
@@ -43,7 +46,7 @@ export default function Upload(): JSX.Element {
 		});
 	}
 
-	function actionButton(): JSX.Element {
+	function getActionButton(): JSX.Element {
 		function isValidFile(): boolean {
 			const fileExt = state.selectedFile.name.split(".").pop();
 			return (
@@ -139,7 +142,7 @@ export default function Upload(): JSX.Element {
 							<>
 								<hr />
 								<div className="justify-content-center">
-									{actionButton()}
+									{getActionButton()}
 								</div>
 							</>
 						)}

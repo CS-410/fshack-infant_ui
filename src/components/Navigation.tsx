@@ -10,54 +10,8 @@ export default function Navigation(): JSX.Element {
 	const [state, setState] = useSharedState();
 
 	useEffect(() => {
-		setState((prev: State) => {
-			return {
-				...prev,
-				username: window.localStorage.getItem("username"),
-			};
-		});
+		setUsername(setState);
 	}, [state.username]);
-
-	function loginStatus(): JSX.Element {
-		if (state.username) {
-			return (
-				<Nav id="logoutButton">
-					<NavDropdown title={<b>{state.username}</b>} id="">
-						<NavDropdown.Item onSelect={handleLogout}>
-							Logout
-						</NavDropdown.Item>
-					</NavDropdown>
-				</Nav>
-			);
-		} else {
-			return (
-				<Nav>
-					<Nav.Link onClick={() => toggleLoginModal(true)}>
-						<b>Login</b>
-					</Nav.Link>
-				</Nav>
-			);
-		}
-	}
-
-	function handleLogout(): void {
-		setState((prev: State) => {
-			return {
-				...prev,
-				username: initialState.username,
-			};
-		});
-		window.localStorage.clear();
-	}
-
-	function toggleLoginModal(boolean: boolean): void {
-		setState((prev: State) => {
-			return {
-				...prev,
-				showLogin: boolean,
-			};
-		});
-	}
 
 	return (
 		<>
@@ -82,14 +36,76 @@ export default function Navigation(): JSX.Element {
 								</Nav.Link>
 							</LinkContainer>
 						</Nav>
-						{loginStatus()}
+						{renderLoginStatus(setState, state.username)}
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
 			<LoginModal
 				show={state.showLogin}
-				onHide={() => toggleLoginModal(false)}
+				onHide={() => toggleLoginModal(setState, false)}
 			/>
 		</>
 	);
+}
+
+function renderLoginStatus(
+	stateSetter: React.Dispatch<React.SetStateAction<State>>,
+	username: string
+): JSX.Element {
+	if (username) {
+		return (
+			<Nav id="logoutButton">
+				<NavDropdown title={<b>{username}</b>} id="">
+					<NavDropdown.Item
+						onSelect={() => handleLogout(stateSetter)}
+					>
+						Logout
+					</NavDropdown.Item>
+				</NavDropdown>
+			</Nav>
+		);
+	} else {
+		return (
+			<Nav>
+				<Nav.Link onClick={() => toggleLoginModal(stateSetter, true)}>
+					<b>Login</b>
+				</Nav.Link>
+			</Nav>
+		);
+	}
+}
+
+function handleLogout(
+	stateSetter: React.Dispatch<React.SetStateAction<State>>
+): void {
+	stateSetter((prev: State) => {
+		return {
+			...prev,
+			username: initialState.username,
+		};
+	});
+	window.localStorage.clear();
+}
+
+function toggleLoginModal(
+	stateSetter: React.Dispatch<React.SetStateAction<State>>,
+	boolean: boolean
+): void {
+	stateSetter((prev: State) => {
+		return {
+			...prev,
+			showLogin: boolean,
+		};
+	});
+}
+
+function setUsername(
+	stateSetter: React.Dispatch<React.SetStateAction<State>>
+): void {
+	stateSetter((prev: State) => {
+		return {
+			...prev,
+			username: window.localStorage.getItem("username"),
+		};
+	});
 }

@@ -5,7 +5,7 @@ function About(): JSX.Element {
 	return (
 		<Container className="py-5">
 			<Row>
-				<Col md={7}>
+				<Col>
 					<h1>About Infant FS Hack</h1>
 					<h2>Background</h2>
 					<p>
@@ -24,26 +24,26 @@ function About(): JSX.Element {
 					<p>
 						<ol>
 							<li>
-								Get the back-end of ChRIS running (further
-								instructions
+								{`Get the back-end of ChRIS running (further
+								instructions `}
 								<a href="http://chrisproject.org/join-us/get-chris-running">
-									{" "}
 									here
 								</a>
-								)
+								{`).`}
 							</li>
 							<li>
 								If you haven't already, log into the ChRIS
-								back-end through our login screen
+								back-end through our login screen.
 							</li>
 							<li>
 								Click the <b> Upload .NII or .DCM dataset </b>
-								button to upload a brain image
+								button to upload a brain image.
 							</li>
 							<li>
 								Afterwards, you can view the newly created feed
 								for the uploaded file as well as pre-existing
-								feeds associated to your CUBE account
+								feeds associated to your CUBE account on the
+								Results page.
 							</li>
 						</ol>
 					</p>
