@@ -59,7 +59,3 @@ export type FeedViewDispatch = React.Dispatch<{
 	type: string;
 	value: FeedViewValue;
 }>;
-
-export type TableStructure = { head: TableHeader; body: TableBody };
-export type TableHeader = { [key: string]: string | undefined }[];
-export type TableBody = string[][];

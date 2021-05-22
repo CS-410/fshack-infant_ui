@@ -13,7 +13,7 @@ import Client, {
 	PluginInstanceParameterList,
 } from "@fnndsc/chrisapi";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import autoTable, { RowInput } from "jspdf-autotable";
 import "../css/FeedView.css";
 import { Loading } from "react-loading-dot";
 import {
@@ -23,9 +23,6 @@ import {
 	FeedViewDispatch,
 	FeedViewState,
 	FeedViewValue,
-	TableBody,
-	TableHeader,
-	TableStructure,
 } from "../shared/interfaces";
 import {
 	feedPageParameter,
@@ -368,53 +365,9 @@ function itemContent(fileObjs: FileObj[]): JSX.Element[] {
 
 function parseStats(content: string): JSX.Element {
 	if (content[0] === "#") {
-		const lines: string[] = content.split("\n");
-		let { head, body, measure } = getTableStructure(lines);
-
-		const headColumnNames: string[] = getColumnNames(
-			head,
-			"col.FieldName",
-			"col.Units"
-		);
-
-		const measureColumnNames: string[] = getColumnNames(
-			measure,
-			"col[1]",
-			"col[3]"
-		);
-		const measureBody = measureColumnNames.map((row: string, i: any) => {
-			return [row, measure[i][2]];
-		});
-
-		const doc = new jsPDF({ orientation: "landscape" });
-
-		if (measure) {
-			autoTable(doc, {
-				theme: "plain",
-				styles: { font: "courier" },
-				showHead: false,
-				columnStyles: {
-					0: { fontStyle: "bold" },
-				},
-				head: [["", ""]],
-				body: measureBody,
-			});
-		}
-
-		autoTable(doc, {
-			theme: "plain",
-			styles: { font: "courier" },
-			head: [headColumnNames],
-			body: body,
-		});
-
-		return (
-			<embed
-				width="100%"
-				height="100%"
-				src={`${doc.output("dataurlstring")}#navpanes=0`}
-			/>
-		);
+		return renderTablelikeStatsPdf(content);
+	} else if (content[0] === "\n" && content[1] === "R") {
+		return renderCurvStatsPdf(content);
 	} else {
 		return (
 			<pre>
@@ -424,10 +377,100 @@ function parseStats(content: string): JSX.Element {
 	}
 }
 
+function renderCurvStatsPdf(content: string): JSX.Element {
+	const data = content
+		.trim()
+		.split("\n\n")
+		.map((table) => table.split("\n"))
+		.map((table) =>
+			table.map((line) => line.trim()).filter((line) => line.length !== 0)
+		)
+		.map((table) =>
+			table.map((line) => {
+				const pair = line.split(":");
+				return pair.map((chunk) => chunk.trim());
+			})
+		);
+
+	const doc = new jsPDF({ orientation: "landscape" });
+
+	data.forEach((table) => {
+		autoTable(doc, {
+			theme: "plain",
+			styles: { font: "courier" },
+			showHead: false,
+			columnStyles: {
+				0: { fontStyle: "bold" },
+			},
+			head: [["", ""]],
+			body: table,
+		});
+	});
+
+	return (
+		<embed
+			width="100%"
+			height="100%"
+			src={`${doc.output("dataurlstring")}#navpanes=0`}
+		/>
+	);
+}
+
+function renderTablelikeStatsPdf(content: string): JSX.Element {
+	const lines: string[] = content.split("\n");
+	let { head, body, measure } = getTableStructure(lines);
+
+	const headColumnNames: string[] = getColumnNames(
+		head,
+		"col.FieldName",
+		"col.Units"
+	);
+
+	const measureColumnNames: string[] = getColumnNames(
+		measure,
+		"col[1]",
+		"col[3]"
+	);
+	const measureBody = measureColumnNames.map((row: string, i: any) => {
+		return [row, measure[i][2]];
+	});
+
+	const doc = new jsPDF({ orientation: "landscape" });
+
+	if (measure) {
+		autoTable(doc, {
+			theme: "plain",
+			styles: { font: "courier" },
+			showHead: false,
+			columnStyles: {
+				0: { fontStyle: "bold" },
+			},
+			head: [["", ""]],
+			body: measureBody,
+		});
+	}
+
+	autoTable(doc, {
+		theme: "plain",
+		styles: { font: "courier" },
+		head: [headColumnNames],
+		body: body,
+	});
+
+	return (
+		<embed
+			width="100%"
+			height="100%"
+			src={`${doc.output("dataurlstring")}#navpanes=0`}
+		/>
+	);
+}
+
 function getTableStructure(lines: string[]) {
 	let head: any = [];
-	let body: any = [];
+	let body: RowInput[] = [];
 	let measure: any = [];
+
 	for (const line of lines) {
 		if (line.startsWith("# TableCol")) {
 			const row: string[] = line
