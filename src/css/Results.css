@@ -1,9 +1,9 @@
 .table > :not(caption) > * > * {
-	padding: 1.2rem 1.2rem;
+	padding: 1.3rem 1.3rem !important;
 }
 
 .table {
-	--bs-table-hover-bg: rgba(0, 0, 0, 0.02);
+	--bs-table-hover-bg: rgba(0, 0, 0, 0.02) !important;
 }
 
 tbody {
